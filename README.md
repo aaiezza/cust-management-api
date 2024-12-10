@@ -177,19 +177,9 @@ Use `curl`, Postman, or any HTTP client to interact with the API.
 
 ## API Documentation
 
-### Local Swagger UI
-Once running locally:
-- **Swagger UI**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-- **OpenAPI Spec**: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+- **Swagger UI:** [View API Documentation](https://aaiezza.github.io/customer-management-api/docs/swagger/)
 
-### Hosting Swagger UI on GitHub Pages
-1. Generate a static site from the OpenAPI spec (e.g., using Swagger Codegen).
-2. Place the generated files in a `docs/` folder at the repository root.
-3. Enable GitHub Pages in the repository settings, pointing to `docs/`.
-4. Update this README with:
-   ```markdown
-   **Interactive Swagger UI (GitHub Pages)**: [https://your-username.github.io/customer-management-api](https://your-username.github.io/customer-management-api)
-   ```
+The Swagger UI provides an interactive interface for exploring and testing the API endpoints defined in the [OpenAPI Specification](docs/openapi.yaml).
 
 ---
 

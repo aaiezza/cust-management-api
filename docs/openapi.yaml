@@ -1,0 +1,283 @@
+openapi: 3.0.1
+info:
+  title: Customer Management API
+  description: A RESTful API for managing customer data
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+paths:
+  /customers:
+    get:
+      summary: Get all customers
+      operationId: getCustomers
+      tags:
+        - Customers
+      responses:
+        '200':
+          description: A list of customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/customer'
+              example:
+                - id: "1"
+                  first_name: "John"
+                  middle_name: "A"
+                  last_name: "Doe"
+                  email_address: "john.doe@example.com"
+                  phone_number: "+1234567890"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "An unexpected error occurred."
+    post:
+      summary: Create a new customer
+      operationId: createCustomer
+      tags:
+        - Customers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/customer_input'
+            example:
+              first_name: "Jane"
+              middle_name: "B"
+              last_name: "Smith"
+              email_address: "jane.smith@example.com"
+              phone_number: "+19876543210"
+      responses:
+        '201':
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer'
+              example:
+                id: "2"
+                first_name: "Jane"
+                middle_name: "B"
+                last_name: "Smith"
+                email_address: "jane.smith@example.com"
+                phone_number: "+19876543210"
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "Invalid request payload."
+        '409':
+          description: Email conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "A customer with the same `email_address` is not allowed."
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "An unexpected error occurred."
+  /customers/{id}:
+    get:
+      summary: Get a customer by ID
+      operationId: getCustomerById
+      tags:
+        - Customers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the customer to retrieve
+      responses:
+        '200':
+          description: Customer found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer'
+              example:
+                id: "1"
+                first_name: "John"
+                middle_name: "A"
+                last_name: "Doe"
+                email_address: "john.doe@example.com"
+                phone_number: "+1234567890"
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "Customer not found."
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "An unexpected error occurred."
+    put:
+      summary: Update a customer by ID
+      operationId: updateCustomer
+      tags:
+        - Customers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the customer to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/customer_input'
+            example:
+              first_name: "John"
+              middle_name: "A"
+              last_name: "Doe"
+              email_address: "john.doe@update.com"
+              phone_number: "+1234567890"
+      responses:
+        '200':
+          description: Customer updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer'
+              example:
+                id: "1"
+                first_name: "John"
+                middle_name: "A"
+                last_name: "Doe"
+                email_address: "john.doe@update.com"
+                phone_number: "+1234567890"
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "Invalid request payload."
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "Customer not found."
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "An unexpected error occurred."
+    delete:
+      summary: Delete a customer by ID
+      operationId: deleteCustomer
+      tags:
+        - Customers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the customer to delete
+      responses:
+        '204':
+          description: Customer deleted
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "Customer not found."
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "An unexpected error occurred."
+components:
+  schemas:
+    customer:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the customer
+        first_name:
+          type: string
+          description: The first name of the customer
+        middle_name:
+          type: string
+          nullable: true
+          description: The middle name of the customer
+        last_name:
+          type: string
+          description: The last name of the customer
+        email_address:
+          type: string
+          description: The email address of the customer
+          pattern: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+        phone_number:
+          type: string
+          description: The phone number of the customer
+          pattern: '^\+?[1-9]\d{1,14}$'
+    customer_input:
+      type: object
+      properties:
+        first_name:
+          type: string
+          description: The first name of the customer
+        middle_name:
+          type: string
+          nullable: true
+          description: The middle name of the customer
+        last_name:
+          type: string
+          description: The last name of the customer
+        email_address:
+          type: string
+          description: The email address of the customer
+          pattern: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+        phone_number:
+          type: string
+          description: The phone number of the customer
+          pattern: '^\+?[1-9]\d{1,14}$'
+    error_response:
+      type: object
+      properties:
+        error_message:
+          type: string
+          description: Detailed error message
