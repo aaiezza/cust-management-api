@@ -16,6 +16,7 @@
         <kotlin.version>2.0.21</kotlin.version>
         <jooq.version>3.19.15</jooq.version>
         <spring-boot.version>3.4.0</spring-boot.version>
+        <flyway.version>11.0.1</flyway.version>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
     </properties>
 
@@ -94,6 +95,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
             </plugin>
 
             <!-- Kotlin Maven Plugin -->
@@ -156,6 +158,27 @@
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>flyway</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.flywaydb</groupId>
+                        <artifactId>flyway-maven-plugin</artifactId>
+                        <version>${flyway.version}</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.flywaydb</groupId>
+                                <artifactId>flyway-database-postgresql</artifactId>
+                                <version>${flyway.version}</version>
+                                <scope>runtime</scope>
+                            </dependency>
+                        </dependencies>
                     </plugin>
                 </plugins>
             </build>
