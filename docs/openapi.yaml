@@ -8,35 +8,6 @@ servers:
     description: Local development server
 paths:
   /customers:
-    get:
-      summary: Get all customers
-      operationId: getCustomers
-      tags:
-        - Customers
-      responses:
-        '200':
-          description: A list of customers
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/customer'
-              example:
-                - id: "1"
-                  first_name: "John"
-                  middle_name: "A"
-                  last_name: "Doe"
-                  email_address: "john.doe@example.com"
-                  phone_number: "+1234567890"
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "An unexpected error occurred."
     post:
       summary: Create a new customer
       operationId: createCustomer
@@ -49,9 +20,8 @@ paths:
             schema:
               $ref: '#/components/schemas/customer_input'
             example:
-              first_name: "Jane"
-              middle_name: "B"
-              last_name: "Smith"
+              full_name: "Jane Smith"
+              preferred_name: "Janie"
               email_address: "jane.smith@example.com"
               phone_number: "+19876543210"
       responses:
@@ -62,10 +32,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/customer'
               example:
-                id: "2"
-                first_name: "Jane"
-                middle_name: "B"
-                last_name: "Smith"
+                id: "3"
+                full_name: "Jane Smith"
+                preferred_name: "Janie"
                 email_address: "jane.smith@example.com"
                 phone_number: "+19876543210"
         '400':
@@ -92,7 +61,95 @@ paths:
                 $ref: '#/components/schemas/error_response'
               example:
                 error_message: "An unexpected error occurred."
+    get:
+      summary: Get all customers
+      operationId: getCustomers
+      tags:
+        - Customers
+      responses:
+        '200':
+          description: A list of customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/customer'
+              example:
+                - id: "1"
+                  full_name: "John Doe"
+                  preferred_name: "Johnny"
+                  email_address: "john.doe@example.com"
+                  phone_number: "+1234567890"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "An unexpected error occurred."
   /customers/{id}:
+    put:
+      summary: Update a customer by ID
+      operationId: updateCustomer
+      tags:
+        - Customers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the customer to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/customer_input'
+            example:
+              full_name: "John Doe"
+              preferred_name: "Johnny"
+              email_address: "john.doe@update.com"
+              phone_number: "+1234567890"
+      responses:
+        '200':
+          description: Customer updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/customer'
+              example:
+                id: "1"
+                full_name: "John Doe"
+                preferred_name: "Johnny"
+                email_address: "john.doe@update.com"
+                phone_number: "+1234567890"
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "Invalid request payload."
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "Customer not found."
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+              example:
+                error_message: "An unexpected error occurred."
     get:
       summary: Get a customer by ID
       operationId: getCustomerById
@@ -114,73 +171,10 @@ paths:
                 $ref: '#/components/schemas/customer'
               example:
                 id: "1"
-                first_name: "John"
-                middle_name: "A"
-                last_name: "Doe"
+                full_name: "John Doe"
+                preferred_name: "Johnny"
                 email_address: "john.doe@example.com"
                 phone_number: "+1234567890"
-        '404':
-          description: Customer not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "Customer not found."
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "An unexpected error occurred."
-    put:
-      summary: Update a customer by ID
-      operationId: updateCustomer
-      tags:
-        - Customers
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-          description: The ID of the customer to update
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/customer_input'
-            example:
-              first_name: "John"
-              middle_name: "A"
-              last_name: "Doe"
-              email_address: "john.doe@update.com"
-              phone_number: "+1234567890"
-      responses:
-        '200':
-          description: Customer updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/customer'
-              example:
-                id: "1"
-                first_name: "John"
-                middle_name: "A"
-                last_name: "Doe"
-                email_address: "john.doe@update.com"
-                phone_number: "+1234567890"
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "Invalid request payload."
         '404':
           description: Customer not found
           content:
@@ -236,16 +230,12 @@ components:
         id:
           type: string
           description: Unique identifier for the customer
-        first_name:
+        full_name:
           type: string
-          description: The first name of the customer
-        middle_name:
+          description: The full name of the customer
+        preferred_name:
           type: string
-          nullable: true
-          description: The middle name of the customer
-        last_name:
-          type: string
-          description: The last name of the customer
+          description: The preferred name of the customer
         email_address:
           type: string
           description: The email address of the customer
@@ -254,19 +244,28 @@ components:
           type: string
           description: The phone number of the customer
           pattern: '^\+?[1-9]\d{1,14}$'
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the customer was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the customer was last updated
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the customer was soft deleted
     customer_input:
       type: object
       properties:
-        first_name:
+        full_name:
           type: string
-          description: The first name of the customer
-        middle_name:
+          description: The full name of the customer
+        preferred_name:
           type: string
-          nullable: true
-          description: The middle name of the customer
-        last_name:
-          type: string
-          description: The last name of the customer
+          description: The preferred name of the customer
         email_address:
           type: string
           description: The email address of the customer

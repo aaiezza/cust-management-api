@@ -1,7 +1,7 @@
 version: '3.9'
 
 services:
-  db:
+  database:
     image: postgres:14-alpine
     container_name: customer_db
     environment:
@@ -17,6 +17,18 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  flyway-migration:
+    image: maven:3.9.5-eclipse-temurin-21
+    container_name: maven_flyway_migration
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/app
+      - ~/.m2:/root/.m2
+    working_dir: /usr/src/app
+    command: [ "mvn", "flyway:migrate", "-P", "flyway" ]
 
 volumes:
   postgres_data:

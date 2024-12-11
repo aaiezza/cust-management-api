@@ -111,26 +111,6 @@ cd customer-management-api
 
 ## Database Configuration
 
-A sample `docker-compose.yml` for Postgres:
-
-```yaml
-version: '3.9'
-services:
-  db:
-    image: postgres:14-alpine
-    container_name: customer_db
-    environment:
-      POSTGRES_USER: customer_user
-      POSTGRES_PASSWORD: customer_pass
-      POSTGRES_DB: customer_db
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U customer_user -d customer_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-```
 
 Start the database:
 
@@ -144,6 +124,14 @@ Environment Variables (in `.env` or your environment):
 DATABASE_URL=jdbc:postgresql://localhost:5432/customer_db
 DATABASE_USER=customer_user
 DATABASE_PASSWORD=customer_pass
+```
+
+Reset the local database:
+```bash
+docker-compose down
+docker volume rm customer-management-api_postgres_data
+docker-compose up database --build -d
+mvn flyway:migrate -P flyway
 ```
 
 ---
