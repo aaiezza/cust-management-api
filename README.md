@@ -3,6 +3,7 @@
 This project provides a RESTful API for managing customer data. It uses **Kotlin**, **Spring Boot**, **Postgres**, and **jOOQ** for type-safe database interactions. The API supports basic CRUD operations, along with validations, custom exception handling, and observability. It also includes automated acceptance testing, containerization for deployment, and instructions for Kubernetes integration.
 
 **Key Features:**
+
 - **Kotlin + Spring Boot**: Simple, concise, and robust backend.
 - **Postgres + jOOQ**: Type-safe SQL queries and schema management.
 - **Validation & Exceptions**: Constructor validation and custom HTTP responses.
@@ -15,6 +16,7 @@ This project provides a RESTful API for managing customer data. It uses **Kotlin
 ---
 
 ## Table of Contents
+
 - [Architecture Overview](#architecture-overview)
 - [Setup and Prerequisites](#setup-and-prerequisites)
 - [Database Configuration](#database-configuration)
@@ -77,8 +79,8 @@ sequenceDiagram
     API-->>Client: 204 No Content or 404 Not Found
 ```
 
-
 **Components:**
+
 - **Client Application**: A CLI tool, frontend, or any HTTP client consuming the API.
 - **Customer Management API**: Spring Boot application exposing CRUD endpoints.
 - **Postgres Database**: Stores customer records. Interacted with via jOOQ.
@@ -90,15 +92,18 @@ sequenceDiagram
 ## Setup and Prerequisites
 
 ### Prerequisites
+
 1. **Java 21+**: Install from [Amazon Corretto](https://aws.amazon.com/corretto/) or your package manager.
 2. **Maven 3.8+**: Verify installation with `mvn -v`.
 3. **Docker & Docker Compose**: For running Postgres and Newman tests easily.
 4. **Postgres**: Run locally or via Docker.
 
 ### Repository
+
 Clone the repository:
+
 ```bash
-git clone https://github.com/your-username/customer-management-api.git
+git clone https://github.com/aaiezza/customer-management-api.git
 cd customer-management-api
 ```
 
@@ -107,6 +112,7 @@ cd customer-management-api
 ## Database Configuration
 
 A sample `docker-compose.yml` for Postgres:
+
 ```yaml
 version: '3.9'
 services:
@@ -127,11 +133,13 @@ services:
 ```
 
 Start the database:
+
 ```bash
 docker-compose up -d
 ```
 
 Environment Variables (in `.env` or your environment):
+
 ```env
 DATABASE_URL=jdbc:postgresql://localhost:5432/customer_db
 DATABASE_USER=customer_user
@@ -143,11 +151,13 @@ DATABASE_PASSWORD=customer_pass
 ## Running the Application
 
 Build the project:
+
 ```bash
 mvn clean install
 ```
 
 Run the application:
+
 ```bash
 mvn spring-boot:run
 ```
@@ -155,9 +165,10 @@ mvn spring-boot:run
 The API is now available at: [http://localhost:8080](http://localhost:8080)
 
 To containerize:
+
 ```bash
-docker build -t your-username/customer-management-api .
-docker run -p 8080:8080 --env-file .env your-username/customer-management-api
+docker build -t aaiezza/customer-management-api .
+docker run -p 8080:8080 --env-file .env aaiezza/customer-management-api
 ```
 
 ---
@@ -165,6 +176,7 @@ docker run -p 8080:8080 --env-file .env your-username/customer-management-api
 ## Usage
 
 **Endpoints:**
+
 - **Create a Customer**: `POST /customers`
 - **List Customers**: `GET /customers`
 - **Get Customer by ID**: `GET /customers/{id}`
@@ -181,16 +193,56 @@ Use `curl`, Postman, or any HTTP client to interact with the API.
 
 The Swagger UI provides an interactive interface for exploring and testing the API endpoints defined in the [OpenAPI Specification](docs/openapi.yaml).
 
+### Swagger Generation Steps:
+
+1. Install and run the `swaggerapi/swagger-ui` Docker container to serve your OpenAPI spec.
+2. Extract Swagger static files:
+   ```bash
+   docker create --name swagger-ui-extract swaggerapi/swagger-ui
+   docker cp swagger-ui-extract:/usr/share/nginx/html ./swagger-static
+   docker rm swagger-ui-extract
+   ```
+3. Move `swagger-static` into `docs/swagger`:
+
+```bash
+mv swagger-static docs/swagger
+```
+
+4. Update `docs/swagger/swagger-initializer.js` to reference the OpenAPI spec:
+
+```javascript
+url: "../openapi.yaml"
+```
+
+5. Commit and push changes, then enable GitHub Pages to serve from the `docs` folder.
+
+---
+
+## jOOQ Code Generation
+
+jOOQ generates type-safe database schema classes. To run the code generation:
+
+1. Ensure the database is running and reachable.
+2. Run the following Maven command:
+
+   ```bash
+   mvn clean install -Pjooq-codegen
+   ```
+
+This will generate the database schema classes in `target/generated-sources/jooq`.
+
 ---
 
 ## Testing
 
 1. **Unit Tests**:
+
    ```bash
    mvn test
    ```
 
 2. **Acceptance Tests (Postman + Newman)**:
+
     - Ensure `postman/collection.json` is available.
     - Run with Newman:
       ```bash
@@ -202,20 +254,23 @@ The Swagger UI provides an interactive interface for exploring and testing the A
 ## CI/CD and Deployment
 
 **GitHub Actions Workflow:**
+
 - Set up a workflow in `.github/workflows/ci.yml` that triggers on merges to `main`.
-- Steps:
-    1. Checkout code.
-    2. Set up Java and build with Maven.
-    3. Run unit and acceptance tests.
-    4. Build and push Docker image to a registry.
-    5. Deploy to test or prod environments if configured.
+    - Steps:
+        1. Checkout code.
+        2. Set up Java and build with Maven.
+        3. Run unit and acceptance tests.
+        4. Build and push Docker image to a registry.
+        5. Deploy to test or prod environments if configured.
 
 ---
 
 ## Kubernetes
 
 To deploy to Kubernetes:
+
 1. Create `deployment.yaml` and `service.yaml` in `k8s/`:
+
    ```yaml
    apiVersion: apps/v1
    kind: Deployment
@@ -233,12 +288,13 @@ To deploy to Kubernetes:
        spec:
          containers:
          - name: customer-management-api
-           image: your-username/customer-management-api:latest
+           image: aaiezza/customer-management-api:latest
            ports:
            - containerPort: 8080
    ```
 
 2. Deploy:
+
    ```bash
    kubectl apply -f k8s/
    ```
@@ -253,3 +309,4 @@ To deploy to Kubernetes:
 2. Commit changes with descriptive messages.
 3. Open a Pull Request against `main`.
 4. Contributions are welcomed and reviewed promptly.
+
