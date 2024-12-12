@@ -7,7 +7,7 @@ import java.util.*
 data class CreateCustomerRequest(
     @JsonProperty("full_name") val fullName: FullName,
     @JsonProperty("preferred_name") val preferredName: PreferredName,
-    @JsonProperty("email_address") val emailAddress: Email,
+    @JsonProperty("email_address") val emailAddress: EmailAddress,
     @JsonProperty("phone_number") val phoneNumber: PhoneNumber,
 ) {
     companion object
@@ -21,7 +21,7 @@ val CreateCustomerRequest.Companion.sample
         phoneNumber = Customer.sample.phoneNumber,
     )
 
-fun CreateCustomerRequest.toCustomer(): Customer = Customer(
+fun CreateCustomerRequest.toCustomerStub(): Customer.Stub = Customer.Stub(
     id = Id(UUID.randomUUID()),
     fullName = this.fullName,
     preferredName = this.preferredName,

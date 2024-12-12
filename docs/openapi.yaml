@@ -252,11 +252,6 @@ components:
           type: string
           format: date-time
           description: Timestamp when the customer was last updated
-        deleted_at:
-          type: string
-          format: date-time
-          nullable: true
-          description: Timestamp when the customer was soft deleted
     customer_input:
       type: object
       properties:

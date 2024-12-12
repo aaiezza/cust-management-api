@@ -2,6 +2,8 @@ package io.github.aaiezza.custman.customer.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonValue
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.*
 import java.util.regex.Pattern
 
@@ -9,8 +11,10 @@ data class Customer(
     @JsonProperty("id") val id: Id,
     @JsonProperty("full_name") val fullName: FullName,
     @JsonProperty("preferred_name") val preferredName: PreferredName,
-    @JsonProperty("email_address") val emailAddress: Email,
+    @JsonProperty("email_address") val emailAddress: EmailAddress,
     @JsonProperty("phone_number") val phoneNumber: PhoneNumber,
+    @JsonProperty("created_at") val createdAt: CreatedAt,
+    @JsonProperty("updated_at") val updatedAt: UpdatedAt,
 ) {
     data class Id(@JsonValue val value: UUID)
 
@@ -26,7 +30,7 @@ data class Customer(
         }
     }
 
-    data class Email(@JsonValue val value: String) {
+    data class EmailAddress(@JsonValue val value: String) {
         init {
             require(value.isNotBlank()) { "Email address cannot be blank." }
             require(EMAIL_REGEX.matcher(value).matches()) { "Invalid email address format." }
@@ -54,6 +58,17 @@ data class Customer(
         }
     }
 
+    data class CreatedAt(@JsonValue val value: OffsetDateTime)
+    data class UpdatedAt(@JsonValue val value: OffsetDateTime)
+
+    data class Stub(
+        val id: Id,
+        val fullName: FullName,
+        val preferredName: PreferredName,
+        val emailAddress: EmailAddress,
+        val phoneNumber: PhoneNumber,
+    )
+
     companion object
 }
 
@@ -62,7 +77,9 @@ val Customer.Companion.sample
         id = Customer.Id(UUID.fromString("00001111-2222-3333-aaaa-bbbbccccdddd")),
         fullName = Customer.FullName("John Doe III"),
         preferredName = Customer.PreferredName("Johnny"),
-        emailAddress = Customer.Email("johnny+company@gmail.com"),
+        emailAddress = Customer.EmailAddress("johnny+company@gmail.com"),
         phoneNumber = Customer.PhoneNumber("+12223334444"),
+        createdAt = Customer.CreatedAt(OffsetDateTime.of(2017, 8, 4, 0, 0, 0, 0, ZoneOffset.UTC)),
+        updatedAt = Customer.UpdatedAt(OffsetDateTime.of(2017, 8, 4, 0, 0, 0, 0, ZoneOffset.UTC)),
     )
 
