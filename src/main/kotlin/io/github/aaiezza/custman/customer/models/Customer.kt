@@ -9,7 +9,7 @@ data class Customer(
     @JsonProperty("id") val id: Id,
     @JsonProperty("full_name") val fullName: FullName,
     @JsonProperty("preferred_name") val preferredName: PreferredName,
-    @JsonProperty("email_address") val email: Email,
+    @JsonProperty("email_address") val emailAddress: Email,
     @JsonProperty("phone_number") val phoneNumber: PhoneNumber,
 ) {
     data class Id(@JsonValue val value: UUID)
@@ -54,7 +54,7 @@ data class Customer(
         }
     }
 
-    companion object {}
+    companion object
 }
 
 val Customer.Companion.sample
@@ -62,7 +62,7 @@ val Customer.Companion.sample
         id = Customer.Id(UUID.fromString("00001111-2222-3333-aaaa-bbbbccccdddd")),
         fullName = Customer.FullName("John Doe III"),
         preferredName = Customer.PreferredName("Johnny"),
-        email = Customer.Email("johnny+company@gmail.com"),
+        emailAddress = Customer.Email("johnny+company@gmail.com"),
         phoneNumber = Customer.PhoneNumber("+12223334444"),
     )
 

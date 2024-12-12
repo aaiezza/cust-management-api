@@ -11,7 +11,7 @@ class CustomerSerializationTest {
 
     @Test
     fun `serialize customer to json`() {
-        val customer = Customer.Companion.sample
+        val customer = Customer.sample
 
         val json = objectMapper.writeValueAsString(customer)
 

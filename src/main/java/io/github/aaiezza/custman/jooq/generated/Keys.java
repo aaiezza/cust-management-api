@@ -4,7 +4,9 @@
 package io.github.aaiezza.custman.jooq.generated;
 
 
+import io.github.aaiezza.custman.jooq.generated.tables.Customer;
 import io.github.aaiezza.custman.jooq.generated.tables.FlywaySchemaHistory;
+import io.github.aaiezza.custman.jooq.generated.tables.records.CustomerRecord;
 import io.github.aaiezza.custman.jooq.generated.tables.records.FlywaySchemaHistoryRecord;
 
 import org.jooq.TableField;
@@ -24,5 +26,8 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<CustomerRecord> PK_CUSTOMER_DBID = Internal.createUniqueKey(Customer.CUSTOMER, DSL.name("pk_customer_dbid"), new TableField[] { Customer.CUSTOMER.CUSTOMER_DBID }, true);
+    public static final UniqueKey<CustomerRecord> UX_CUSTOMER_EMAIL_ADDRESS = Internal.createUniqueKey(Customer.CUSTOMER, DSL.name("ux_customer_email_address"), new TableField[] { Customer.CUSTOMER.EMAIL_ADDRESS }, true);
+    public static final UniqueKey<CustomerRecord> UX_CUSTOMER_ID = Internal.createUniqueKey(Customer.CUSTOMER, DSL.name("ux_customer_id"), new TableField[] { Customer.CUSTOMER.CUSTOMER_ID }, true);
     public static final UniqueKey<FlywaySchemaHistoryRecord> FLYWAY_SCHEMA_HISTORY_PK = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, DSL.name("flyway_schema_history_pk"), new TableField[] { FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK }, true);
 }

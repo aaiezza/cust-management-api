@@ -4,6 +4,7 @@
 package io.github.aaiezza.custman.jooq.generated;
 
 
+import io.github.aaiezza.custman.jooq.generated.tables.Customer;
 import io.github.aaiezza.custman.jooq.generated.tables.FlywaySchemaHistory;
 
 
@@ -12,6 +13,11 @@ import io.github.aaiezza.custman.jooq.generated.tables.FlywaySchemaHistory;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
+
+    /**
+     * The table <code>public.customer</code>.
+     */
+    public static final Customer CUSTOMER = Customer.CUSTOMER;
 
     /**
      * The table <code>public.flyway_schema_history</code>.

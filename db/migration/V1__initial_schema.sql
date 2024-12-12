@@ -10,9 +10,9 @@ CREATE TABLE customer (
   phone_number VARCHAR(15) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-  deleted_at TIMESTAMP WITH TIME ZONE
+  deleted_at TIMESTAMP WITH TIME ZONE,
   CONSTRAINT pk_customer_dbid PRIMARY KEY (customer_dbid),
-  CONSTRAINT ux_customer_id UNIQUE (customer_id)
+  CONSTRAINT ux_customer_id UNIQUE (customer_id),
   CONSTRAINT ux_customer_email_address UNIQUE (email_address)
 );
 
