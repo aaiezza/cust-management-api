@@ -4,9 +4,7 @@
 package io.github.aaiezza.custman.jooq.generated;
 
 
-import io.github.aaiezza.custman.jooq.generated.tables.Customer;
 import io.github.aaiezza.custman.jooq.generated.tables.FlywaySchemaHistory;
-import io.github.aaiezza.custman.jooq.generated.tables.records.CustomerRecord;
 import io.github.aaiezza.custman.jooq.generated.tables.records.FlywaySchemaHistoryRecord;
 
 import org.jooq.TableField;
@@ -26,7 +24,5 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<CustomerRecord> CUSTOMER_EMAIL_ADDRESS_KEY = Internal.createUniqueKey(Customer.CUSTOMER, DSL.name("customer_email_address_key"), new TableField[] { Customer.CUSTOMER.EMAIL_ADDRESS }, true);
-    public static final UniqueKey<CustomerRecord> CUSTOMER_PKEY = Internal.createUniqueKey(Customer.CUSTOMER, DSL.name("customer_pkey"), new TableField[] { Customer.CUSTOMER.CUSTOMER_ID }, true);
     public static final UniqueKey<FlywaySchemaHistoryRecord> FLYWAY_SCHEMA_HISTORY_PK = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, DSL.name("flyway_schema_history_pk"), new TableField[] { FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK }, true);
 }

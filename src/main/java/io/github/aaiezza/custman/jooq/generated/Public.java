@@ -4,7 +4,6 @@
 package io.github.aaiezza.custman.jooq.generated;
 
 
-import io.github.aaiezza.custman.jooq.generated.tables.Customer;
 import io.github.aaiezza.custman.jooq.generated.tables.FlywaySchemaHistory;
 
 import java.util.Arrays;
@@ -29,11 +28,6 @@ public class Public extends SchemaImpl {
     public static final Public PUBLIC = new Public();
 
     /**
-     * The table <code>public.customer</code>.
-     */
-    public final Customer CUSTOMER = Customer.CUSTOMER;
-
-    /**
      * The table <code>public.flyway_schema_history</code>.
      */
     public final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
@@ -54,7 +48,6 @@ public class Public extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
-            Customer.CUSTOMER,
             FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY
         );
     }
