@@ -30,5 +30,22 @@ services:
     working_dir: /usr/src/app
     command: [ "mvn", "flyway:migrate", "-P", "flyway" ]
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: customer_management_app
+    ports:
+      - "8080:8080"
+
+  maven-install:
+    image: maven:3.9.5-eclipse-temurin-21
+    container_name: maven_install_service
+    volumes:
+      - .:/usr/src/app
+      - ~/.m2:/root/.m2
+    working_dir: /usr/src/app
+    command: [ "mvn", "clean", "install" ]
+
 volumes:
   postgres_data:
