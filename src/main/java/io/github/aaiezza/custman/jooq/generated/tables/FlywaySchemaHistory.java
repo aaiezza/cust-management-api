@@ -9,7 +9,7 @@ import io.github.aaiezza.custman.jooq.generated.Keys;
 import io.github.aaiezza.custman.jooq.generated.Public;
 import io.github.aaiezza.custman.jooq.generated.tables.records.FlywaySchemaHistoryRecord;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -92,7 +92,7 @@ public class FlywaySchemaHistory extends TableImpl<FlywaySchemaHistoryRecord> {
     /**
      * The column <code>public.flyway_schema_history.installed_on</code>.
      */
-    public final TableField<FlywaySchemaHistoryRecord, LocalDateTime> INSTALLED_ON = createField(DSL.name("installed_on"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.LOCALDATETIME)), this, "");
+    public final TableField<FlywaySchemaHistoryRecord, OffsetDateTime> INSTALLED_ON = createField(DSL.name("installed_on"), SQLDataType.TIMESTAMPWITHTIMEZONE.nullable(false).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
 
     /**
      * The column <code>public.flyway_schema_history.execution_time</code>.

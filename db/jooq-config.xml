@@ -13,6 +13,12 @@
         <database>
             <name>org.jooq.meta.postgres.PostgresDatabase</name>
             <inputSchema>public</inputSchema>
+            <forcedTypes>
+                <forcedType>
+                    <name>OffsetDateTime</name>
+                    <types>.*TIMESTAMP.*</types>
+                </forcedType>
+            </forcedTypes>
         </database>
         <target>
             <packageName>io.github.aaiezza.custman.jooq.generated</packageName>
