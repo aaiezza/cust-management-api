@@ -30,6 +30,18 @@ services:
     working_dir: /usr/src/app
     command: [ "mvn", "flyway:migrate", "-P", "flyway" ]
 
+  jooq-codegen:
+    image: maven:3.8.8-eclipse-temurin-17
+    container_name: maven_jooq_codegen
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - ~/.m2:/root/.m2
+    working_dir: /app
+    entrypoint: ["mvn", "generate-sources", "-P", "jooq-codegen"]
+
   app:
     build:
       context: .
