@@ -7,7 +7,7 @@ servers:
   - url: http://localhost:8080
     description: Local development server
 paths:
-  /customers:
+  /customer:
     post:
       summary: Create a new customer
       operationId: createCustomer
@@ -89,7 +89,7 @@ paths:
                 $ref: '#/components/schemas/error_response'
               example:
                 error_message: "An unexpected error occurred."
-  /customers/{id}:
+  /customer/{id}:
     put:
       summary: Update a customer by ID
       operationId: updateCustomer
