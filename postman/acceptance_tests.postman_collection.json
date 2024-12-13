@@ -37,12 +37,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/customer",
-					"protocol": "http",
+					"raw": "{{host}}/customer",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "8080",
 					"path": [
 						"customer"
 					]
@@ -71,12 +69,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/customer/{{customer_id}}",
-					"protocol": "http",
+					"raw": "{{host}}/customer/{{customer_id}}",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "8080",
 					"path": [
 						"customer",
 						"{{customer_id}}"
@@ -106,12 +102,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/customer",
-					"protocol": "http",
+					"raw": "{{host}}/customer",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "8080",
 					"path": [
 						"customer"
 					]
@@ -149,12 +143,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/customer/{{customer_id}}",
-					"protocol": "http",
+					"raw": "{{host}}/customer/{{customer_id}}",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "8080",
 					"path": [
 						"customer",
 						"{{customer_id}}"
@@ -184,12 +176,10 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/customer/{{customer_id}}",
-					"protocol": "http",
+					"raw": "{{host}}/customer/{{customer_id}}",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "8080",
 					"path": [
 						"customer",
 						"{{customer_id}}"
@@ -219,6 +209,13 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "http://localhost:8080",
+			"type": "string"
 		}
 	]
 }

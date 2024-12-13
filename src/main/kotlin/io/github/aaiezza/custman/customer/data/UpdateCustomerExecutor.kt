@@ -10,12 +10,14 @@ import org.springframework.stereotype.Service
 @Service
 class UpdateCustomerExecutor(
     private val getCustomerByIdExecutor: GetCustomerByIdExecutor,
-    private val emailExistsExecutor: EmailExistsExecutor,
+    private val getCustomerByEmailAddressExecutor: GetCustomerByEmailAddressExecutor,
     private val dslContext: DSLContext
 ) {
     // TODO: Add logging
     fun execute(customerId: Customer.Id, request: UpdateCustomerRequest): Customer {
-        if (emailExistsExecutor.execute(request.emailAddress)) {
+        val existingCustomer = getCustomerByEmailAddressExecutor.execute(request.emailAddress)
+
+        if (existingCustomer != null && existingCustomer.customerId != customerId) {
             throw CustomerAlreadyExistsWithGivenEmailException(request.emailAddress)
         }
         with(request) {
