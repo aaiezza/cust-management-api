@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: flyway-migration
+spec:
+  template:
+    spec:
+      containers:
+        - name: flyway
+          image: flyway/flyway:latest
+          args:
+            - -url=jdbc:postgresql://postgres-service:5432/customer_db
+            - -user=customer_user
+            - -password=customer_pass
+            - -locations=filesystem:/flyway/db/migration
+            - migrate
+          volumeMounts:
+            - mountPath: /flyway/db/migration
+              name: flyway-sql
+      restartPolicy: Never
+      volumes:
+        - name: flyway-sql
+          configMap:
+            name: flyway-sql-config
+  backoffLimit: 1

@@ -26,6 +26,7 @@ This project provides a RESTful API for managing customer data. It uses **Kotlin
 - [Testing](#testing)
 - [CI/CD and Deployment](#cicd-and-deployment)
 - [Kubernetes](#kubernetes)
+    - [Deploying Locally](#deploying-locally)
 - [Contributing](#contributing)
 
 ---
@@ -110,7 +111,6 @@ cd customer-management-api
 ---
 
 ## Database Configuration
-
 
 Start the database:
 
@@ -288,6 +288,110 @@ To deploy to Kubernetes:
    ```
 
 3. Access the application via `kubectl port-forward` or a LoadBalancer/Ingress.
+
+### Deploying Locally
+
+To deploy the application locally using Kubernetes:
+
+1. **Start Minikube:**
+   ```bash
+   minikube start
+   ```
+
+2. **Load the Docker image into Minikube:**
+   ```bash
+   minikube image load aaiezza/customer-management-api:latest
+   ```
+
+3. **Apply the Kubernetes Manifests:**
+   ```bash
+   kubectl apply -f k8s/
+   ```
+
+4. **Access the Application:**
+   Use `kubectl port-forward` to expose the application locally:
+   ```bash
+   kubectl port-forward service/customer-management-api 8080:8080
+   ```
+
+   Alternatively, enable the Minikube service tunnel:
+   ```bash
+   minikube service customer-management-api
+   ```
+
+5. **Verify Deployment:**
+   Check the status of the pods:
+   ```bash
+   kubectl get pods
+   ```
+   Ensure all pods are in the `Running` state.
+
+6. **Watch the Pods:**
+   To monitor the state of pods in real time, use:
+   ```bash
+   kubectl get pods --watch
+   ```
+
+7. **Rollout and Restart:**
+   If you need to deploy updated code or configurations, perform a rollout restart:
+   ```bash
+   kubectl rollout restart deployment/customer-management-api
+   ```
+   To check the status of the rollout:
+   ```bash
+   kubectl rollout status deployment/customer-management-api
+   ```
+
+8. **Run Flyway Migrations:**
+   To apply Flyway migrations to the Postgres database deployed in Kubernetes, use a Kubernetes job or a local Flyway container.
+
+   **Option 1: Run as a Kubernetes Job**
+   ```bash
+   kubectl create job flyway-migration --image=flyway/flyway -- \
+   -url=jdbc:postgresql://postgres-service:5432/customer_db \
+   -user=customer_user -password=customer_pass migrate
+   ```
+
+   **Option 2: Run Flyway Locally (with Port Forwarding)**
+   ```bash
+   kubectl port-forward service/postgres-service 5432:5432
+   docker run --rm -v $(pwd)/sql:/flyway/sql flyway/flyway:latest \
+   -url=jdbc:postgresql://localhost:5432/customer_db \
+   -user=customer_user -password=customer_pass migrate
+   ```
+
+1. **Start Minikube:**
+   ```bash
+   minikube start
+   ```
+
+2. **Load the Docker image into Minikube:**
+   ```bash
+   minikube image load aaiezza/customer-management-api:latest
+   ```
+
+3. **Apply the Kubernetes Manifests:**
+   ```bash
+   kubectl apply -f k8s/
+   ```
+
+4. **Access the Application:**
+   Use `kubectl port-forward` to expose the application locally:
+   ```bash
+   kubectl port-forward service/customer-management-api 8080:8080
+   ```
+
+   Alternatively, enable the Minikube service tunnel:
+   ```bash
+   minikube service customer-management-api
+   ```
+
+5. **Verify Deployment:**
+   Check the status of the pods:
+   ```bash
+   kubectl get pods
+   ```
+   Ensure all pods are in the `Running` state.
 
 ---
 

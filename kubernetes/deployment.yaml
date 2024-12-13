@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-management-api
+  labels:
+    app: customer-management-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: customer-management-api
+  template:
+    metadata:
+      labels:
+        app: customer-management-api
+    spec:
+      containers:
+        - name: customer-management-api
+          image: customer-management-api-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://postgres-service:5432/customer_db"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "customer_user"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "customer_pass"
