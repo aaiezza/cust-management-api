@@ -1,10 +1,12 @@
 package io.github.aaiezza.custman.customer
 
 import io.github.aaiezza.custman.customer.data.CreateCustomerExecutor
+import io.github.aaiezza.custman.customer.data.GetAllCustomersExecutor
 import io.github.aaiezza.custman.customer.data.GetCustomerByIdExecutor
 import io.github.aaiezza.custman.customer.logevents.CustomerCreatedLogEvent
 import io.github.aaiezza.custman.customer.models.CreateCustomerRequest
 import io.github.aaiezza.custman.customer.models.Customer
+import io.github.aaiezza.custman.customer.models.Customers
 import io.github.aaiezza.klogging.info
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -15,9 +17,14 @@ import java.util.*
 @RestController
 @RequestMapping("/customer")
 class CustomerController(
+    @Autowired private val getAllCustomersExecutor: GetAllCustomersExecutor,
     @Autowired private val createCustomerExecutor: CreateCustomerExecutor,
     @Autowired private val getCustomerByIdExecutor: GetCustomerByIdExecutor,
 ) {
+    @GetMapping
+    fun getAllCustomers(): ResponseEntity<Customers> =
+        getAllCustomersExecutor.execute()
+            .let { ResponseEntity.ok(it) }
 
     @PostMapping
     fun createCustomer(@RequestBody request: CreateCustomerRequest): ResponseEntity<Customer> =

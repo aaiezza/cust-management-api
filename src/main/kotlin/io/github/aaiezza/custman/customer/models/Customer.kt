@@ -88,3 +88,5 @@ val Customer.Companion.sample
         updatedAt = Customer.UpdatedAt(OffsetDateTime.of(2017, 8, 4, 0, 0, 0, 0, ZoneOffset.UTC)),
     )
 
+
+data class Customers(@JsonProperty("customers") val value: List<Customer>)
