@@ -30,14 +30,14 @@ abstract class BaseLogEvent private constructor(
 
 private val logger = KotlinLogging.logger {}
 
-fun LogEvent.info() {
+private fun LogEvent.log(logger: (message: () -> Any?) -> Unit) {
     MDC.put("event_id", eventId.toString())
     MDC.put("action", action)
     val stack = Thread.currentThread().stackTrace
     MDC.put("logger_name", "${stack[2].className}.${stack[2].methodName}")
     data.entries.forEach { MDC.put(it.key, it.value.toString()) }
     try {
-        logger.info { "" }
+        logger { "" }
     } finally {
         MDC.remove("event_id")
         MDC.remove("action")
@@ -45,3 +45,9 @@ fun LogEvent.info() {
         data.forEach { MDC.remove(it.key) }
     }
 }
+
+fun LogEvent.info() = log(logger::info)
+fun LogEvent.error() = log(logger::error)
+fun LogEvent.warn() = log(logger::warn)
+fun LogEvent.debug() = log(logger::debug)
+fun LogEvent.trace() = log(logger::trace)

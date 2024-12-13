@@ -126,6 +126,50 @@
 					"listen": "test",
 					"script": {
 						"exec": [
+							"pm.test('Should return 200 ok response', () => {",
+							"    pm.response.to.be.ok;",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"full_name\": \"Jonathon Doe Jr.\",\n    \"preferred_name\": \"John\",\n    \"email_address\": \"johnny.doe@example.com\",\n    \"phone_number\": \"+12223335474\"\n}   \n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/customer/{{customer_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"customer",
+						"{{customer_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Customer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
 							"pm.test('Should return 204 no content response', () => {",
 							"    pm.response.to.have.status(204);",
 							"});",

@@ -4,7 +4,6 @@ import io.github.aaiezza.custman.customer.CustomerAlreadyExistsWithGivenEmailExc
 import io.github.aaiezza.custman.customer.models.CreateCustomerRequest
 import io.github.aaiezza.custman.customer.models.Customer
 import io.github.aaiezza.custman.customer.models.toCustomerStub
-import io.github.aaiezza.custman.jooq.generated.Tables
 import io.github.aaiezza.custman.jooq.generated.Tables.CUSTOMER
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
@@ -16,7 +15,7 @@ class CreateCustomerExecutor(
 ) {
     // TODO: Add logging
     fun execute(request: CreateCustomerRequest): Customer {
-        if(emailExistsExecutor.execute(request.emailAddress)) {
+        if (emailExistsExecutor.execute(request.emailAddress)) {
             throw CustomerAlreadyExistsWithGivenEmailException(request.emailAddress)
         }
         val customer = request.toCustomerStub()
@@ -53,7 +52,7 @@ class CreateCustomerExecutor(
             }
             ?: run {
                 // TODO: create custom exception and log
-                throw IllegalStateException("Failed to insert customer")
+                error { "Failed to insert customer" }
             }
 
         // TODO: add logging

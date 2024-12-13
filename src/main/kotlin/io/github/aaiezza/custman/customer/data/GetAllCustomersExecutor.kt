@@ -14,6 +14,7 @@ class GetAllCustomersExecutor(
         dslContext.select()
             .from(CUSTOMER)
             .where(CUSTOMER.DELETED_AT.isNull())
+            .orderBy(CUSTOMER.UPDATED_AT.desc())
             .fetch {
                 Customer(
                     customerId = Customer.Id(it.getValue(CUSTOMER.CUSTOMER_ID)),

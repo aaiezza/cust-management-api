@@ -21,10 +21,18 @@ val CreateCustomerRequest.Companion.sample
         phoneNumber = Customer.sample.phoneNumber,
     )
 
-fun CreateCustomerRequest.toCustomerStub(): Customer.Stub = Customer.Stub(
+fun CreateCustomerRequest.toCustomerStub(): Stub = Stub(
     id = Id(UUID.randomUUID()),
     fullName = this.fullName,
     preferredName = this.preferredName,
     emailAddress = this.emailAddress,
     phoneNumber = this.phoneNumber,
+)
+
+
+data class UpdateCustomerRequest(
+    @JsonProperty("full_name") val fullName: FullName,
+    @JsonProperty("preferred_name") val preferredName: PreferredName,
+    @JsonProperty("email_address") val emailAddress: EmailAddress,
+    @JsonProperty("phone_number") val phoneNumber: PhoneNumber,
 )
