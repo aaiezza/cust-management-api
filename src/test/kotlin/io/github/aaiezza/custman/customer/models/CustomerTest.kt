@@ -3,11 +3,20 @@ package io.github.aaiezza.custman.customer.models
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class CustomerSerializationTest {
 
-    private val objectMapper = ObjectMapper()
+    private lateinit var objectMapper: ObjectMapper
+
+    @BeforeEach
+    fun setUp() {
+        objectMapper =
+            ObjectMapper().registerModule(JavaTimeModule())
+    }
 
     @Test
     fun `serialize customer to json`() {
@@ -17,7 +26,7 @@ class CustomerSerializationTest {
 
         val expected = """
             {
-              "id": "%s",
+              "customer_id": "%s",
               "fullName": "%s",
               "preferredName": "%s",
               "email": "%s",
@@ -26,10 +35,10 @@ class CustomerSerializationTest {
             """.trimIndent()
             .replace(Regex("\\s+"), "")
             .format(
-                customer.id.value,
+                customer.customerId.value,
                 customer.fullName.value,
                 customer.preferredName.value,
-                customer.email.value,
+                customer.emailAddress.value,
                 customer.phoneNumber.value,
             )
 

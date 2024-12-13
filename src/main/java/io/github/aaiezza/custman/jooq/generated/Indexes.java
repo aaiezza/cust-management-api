@@ -25,5 +25,5 @@ public class Indexes {
 
     public static final Index FLYWAY_SCHEMA_HISTORY_S_IDX = Internal.createIndex(DSL.name("flyway_schema_history_s_idx"), FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, new OrderField[] { FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.SUCCESS }, false);
     public static final Index IX_CUSTOMER_PHONE = Internal.createIndex(DSL.name("ix_customer_phone"), Customer.CUSTOMER, new OrderField[] { Customer.CUSTOMER.PHONE_NUMBER }, false);
-    public static final Index UX_CUSTOMER_EMAIL = Internal.createIndex(DSL.name("ux_customer_email"), Customer.CUSTOMER, new OrderField[] { Customer.CUSTOMER.EMAIL_ADDRESS }, false);
+    public static final Index UX_CUSTOMER_EMAIL_ADDRESS = Internal.createIndex(DSL.name("ux_customer_email_address"), Customer.CUSTOMER, new OrderField[] { Customer.CUSTOMER.EMAIL_ADDRESS }, true);
 }

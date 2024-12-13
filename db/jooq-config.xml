@@ -15,7 +15,7 @@
             <inputSchema>public</inputSchema>
             <forcedTypes>
                 <forcedType>
-                    <name>OffsetDateTime</name>
+                    <name>LocalDateTime</name>
                     <types>.*TIMESTAMP.*</types>
                 </forcedType>
             </forcedTypes>

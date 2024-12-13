@@ -137,7 +137,7 @@ public class Customer extends TableImpl<CustomerRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.IX_CUSTOMER_PHONE, Indexes.UX_CUSTOMER_EMAIL);
+        return Arrays.asList(Indexes.IX_CUSTOMER_PHONE, Indexes.UX_CUSTOMER_EMAIL_ADDRESS);
     }
 
     @Override
@@ -152,7 +152,7 @@ public class Customer extends TableImpl<CustomerRecord> {
 
     @Override
     public List<UniqueKey<CustomerRecord>> getUniqueKeys() {
-        return Arrays.asList(Keys.UX_CUSTOMER_EMAIL_ADDRESS, Keys.UX_CUSTOMER_ID);
+        return Arrays.asList(Keys.UX_CUSTOMER_ID);
     }
 
     @Override

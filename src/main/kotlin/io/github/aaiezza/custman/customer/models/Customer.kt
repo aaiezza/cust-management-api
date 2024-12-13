@@ -2,13 +2,16 @@ package io.github.aaiezza.custman.customer.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonValue
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.annotation.JsonNaming
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 import java.util.regex.Pattern
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class Customer(
-    @JsonProperty("id") val id: Id,
+    @JsonProperty("customer_id") val customerId: Id,
     @JsonProperty("full_name") val fullName: FullName,
     @JsonProperty("preferred_name") val preferredName: PreferredName,
     @JsonProperty("email_address") val emailAddress: EmailAddress,
@@ -16,7 +19,9 @@ data class Customer(
     @JsonProperty("created_at") val createdAt: CreatedAt,
     @JsonProperty("updated_at") val updatedAt: UpdatedAt,
 ) {
-    data class Id(@JsonValue val value: UUID)
+    data class Id(@JsonValue val value: UUID) {
+        override fun toString() = value.toString()
+    }
 
     data class FullName(@JsonValue val value: String) {
         init {
@@ -74,7 +79,7 @@ data class Customer(
 
 val Customer.Companion.sample
     get() = Customer(
-        id = Customer.Id(UUID.fromString("00001111-2222-3333-aaaa-bbbbccccdddd")),
+        customerId = Customer.Id(UUID.fromString("00001111-2222-3333-aaaa-bbbbccccdddd")),
         fullName = Customer.FullName("John Doe III"),
         preferredName = Customer.PreferredName("Johnny"),
         emailAddress = Customer.EmailAddress("johnny+company@gmail.com"),

@@ -1,26 +1,36 @@
 package io.github.aaiezza.custman.customer
 
 import io.github.aaiezza.custman.customer.data.CreateCustomerExecutor
+import io.github.aaiezza.custman.customer.data.GetCustomerByIdExecutor
+import io.github.aaiezza.custman.customer.logevents.CustomerCreatedLogEvent
 import io.github.aaiezza.custman.customer.models.CreateCustomerRequest
 import io.github.aaiezza.custman.customer.models.Customer
+import io.github.aaiezza.klogging.info
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import java.net.URI
+import java.util.*
 
 @RestController
 @RequestMapping("/customer")
 class CustomerController(
-    @Autowired private val createCustomerExecutor: CreateCustomerExecutor
+    @Autowired private val createCustomerExecutor: CreateCustomerExecutor,
+    @Autowired private val getCustomerByIdExecutor: GetCustomerByIdExecutor,
 ) {
 
     @PostMapping
-    fun createCustomer(@RequestBody request: CreateCustomerRequest): ResponseEntity<Customer> {
-        val createdCustomer = createCustomerExecutor.execute(request)
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdCustomer)
-    }
+    fun createCustomer(@RequestBody request: CreateCustomerRequest): ResponseEntity<Customer> =
+        createCustomerExecutor.execute(request)
+            .let {
+                CustomerCreatedLogEvent(it).info()
+                val location = URI.create("/customer/${it.customerId.value}")
+                ResponseEntity.created(location).body(it)
+            }
+
+    @GetMapping("/{customerId}")
+    fun getCustomerById(@PathVariable customerId: String): ResponseEntity<Customer> =
+        getCustomerByIdExecutor.execute(Customer.Id(UUID.fromString(customerId)))
+            ?.let { ResponseEntity.ok(it) } ?: ResponseEntity.notFound().build()
 }
 
