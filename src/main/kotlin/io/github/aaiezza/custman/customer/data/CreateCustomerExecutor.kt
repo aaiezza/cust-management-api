@@ -1,5 +1,6 @@
 package io.github.aaiezza.custman.customer.data
 
+import io.github.aaiezza.custman.customer.CustomerAlreadyExistsWithGivenEmailException
 import io.github.aaiezza.custman.customer.models.CreateCustomerRequest
 import io.github.aaiezza.custman.customer.models.Customer
 import io.github.aaiezza.custman.customer.models.toCustomerStub
@@ -16,8 +17,7 @@ class CreateCustomerExecutor(
     // TODO: Add logging
     fun execute(request: CreateCustomerRequest): Customer {
         if(emailExistsExecutor.execute(request.emailAddress)) {
-            // TODO: This is a fine exception, but obfuscate this at the endpoint. No 409, because could be exploited to search emails.
-            error { "Email address ${request.emailAddress} already exists" }
+            throw CustomerAlreadyExistsWithGivenEmailException(request.emailAddress)
         }
         val customer = request.toCustomerStub()
             .let {
