@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import java.util.*
 import java.util.regex.Pattern
 
@@ -79,13 +78,13 @@ data class Customer(
 
 val Customer.Companion.sample: Customer
     get() = Customer(
-            customerId = Customer.Id(UUID.fromString("00001111-2222-3333-aaaa-bbbbccccdddd")),
-            fullName = Customer.FullName("John Doe III"),
-            preferredName = Customer.PreferredName("Johnny"),
-            emailAddress = Customer.EmailAddress("johnny+company@gmail.com"),
-            phoneNumber = Customer.PhoneNumber("+12223334444"),
-            createdAt = Customer.CreatedAt(OffsetDateTime.of(2017, 8, 4, 0, 0, 0, 0, ZoneOffset.UTC)),
-            updatedAt = Customer.UpdatedAt(OffsetDateTime.of(2017, 8, 4, 0, 0, 0, 0, ZoneOffset.UTC)),
+        customerId = Customer.Id(UUID.fromString("00001111-2222-3333-aaaa-bbbbccccdddd")),
+        fullName = Customer.FullName("John Doe III"),
+        preferredName = Customer.PreferredName("Johnny"),
+        emailAddress = Customer.EmailAddress("johnny+company@gmail.com"),
+        phoneNumber = Customer.PhoneNumber("+12223334444"),
+        createdAt = Customer.CreatedAt(OffsetDateTime.parse("2017-08-04T00:00:00.123Z")),
+        updatedAt = Customer.UpdatedAt(OffsetDateTime.parse("2017-08-04T00:00:00.123Z"))
     )
 
 data class Customers(@JsonProperty("customers") val value: List<Customer>)

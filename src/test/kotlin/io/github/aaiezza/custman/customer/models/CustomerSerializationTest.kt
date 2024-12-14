@@ -1,46 +1,58 @@
 package io.github.aaiezza.custman.customer.models
 
-import assertk.assertThat
-import assertk.assertions.isEqualTo
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.json.JsonTest
 
+@JsonTest
 class CustomerSerializationTest {
 
+    @Autowired
     private lateinit var objectMapper: ObjectMapper
 
-    @BeforeEach
-    fun setUp() {
-        objectMapper =
-            ObjectMapper().registerModule(JavaTimeModule())
+    @Test
+    fun `should serialize sample Customer object to JSON`() {
+        val customer = Customer.sample
+
+        val expectedJson = """
+            {
+                "customer_id": "${customer.customerId.value}",
+                "full_name": "${customer.fullName.value}",
+                "preferred_name": "${customer.preferredName.value}",
+                "email_address": "${customer.emailAddress.value}",
+                "phone_number": "${customer.phoneNumber.value}",
+                "created_at": "${customer.createdAt.value}",
+                "updated_at": "${customer.updatedAt.value}"
+            }
+        """.trimIndent()
+
+        val serializedJson = objectMapper.writeValueAsString(customer)
+
+        val expectedNode = objectMapper.readTree(expectedJson)
+        val actualNode = objectMapper.readTree(serializedJson)
+
+        assertEquals(expectedNode, actualNode)
     }
 
     @Test
-    fun `serialize customer to json`() {
+    fun `should deserialize JSON to Customer object`() {
         val customer = Customer.sample
-
-        val json = objectMapper.writeValueAsString(customer)
-
-        val expected = """
+        val json = """
             {
-              "customer_id": "%s",
-              "fullName": "%s",
-              "preferredName": "%s",
-              "email": "%s",
-              "phoneNumber": "%s"
+                "customer_id": "${customer.customerId.value}",
+                "full_name": "${customer.fullName.value}",
+                "preferred_name": "${customer.preferredName.value}",
+                "email_address": "${customer.emailAddress.value}",
+                "phone_number": "${customer.phoneNumber.value}",
+                "created_at": "${customer.createdAt.value}",
+                "updated_at": "${customer.updatedAt.value}"
             }
-            """.trimIndent()
-            .replace(Regex("\\s+"), "")
-            .format(
-                customer.customerId.value,
-                customer.fullName.value,
-                customer.preferredName.value,
-                customer.emailAddress.value,
-                customer.phoneNumber.value,
-            )
+        """.trimIndent()
 
-        assertThat(json).isEqualTo(expected)
+        val deserializedCustomer = objectMapper.readValue(json, Customer::class.java)
+
+        assertEquals(customer, deserializedCustomer)
     }
 }
