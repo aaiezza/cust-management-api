@@ -35,4 +35,14 @@ data class UpdateCustomerRequest(
     @JsonProperty("preferred_name") val preferredName: PreferredName,
     @JsonProperty("email_address") val emailAddress: EmailAddress,
     @JsonProperty("phone_number") val phoneNumber: PhoneNumber,
-)
+) {
+    companion object
+}
+
+val UpdateCustomerRequest.Companion.sample
+    get() = UpdateCustomerRequest(
+        fullName = Customer.sample.fullName,
+        preferredName = Customer.sample.preferredName,
+        emailAddress = Customer.EmailAddress("johnny.doe@gmail.com"),
+        phoneNumber = Customer.sample.phoneNumber,
+    )
