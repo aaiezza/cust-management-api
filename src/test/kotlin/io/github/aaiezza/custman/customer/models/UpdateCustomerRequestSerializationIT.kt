@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.json.JsonTest
 
 @JsonTest
-class UpdateCustomerRequestSerializationTest {
+class UpdateCustomerRequestSerializationIT {
 
     @Autowired
     private lateinit var objectMapper: ObjectMapper
