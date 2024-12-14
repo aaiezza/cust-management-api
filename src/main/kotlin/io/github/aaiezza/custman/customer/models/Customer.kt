@@ -77,16 +77,15 @@ data class Customer(
     companion object
 }
 
-val Customer.Companion.sample
+val Customer.Companion.sample: Customer
     get() = Customer(
-        customerId = Customer.Id(UUID.fromString("00001111-2222-3333-aaaa-bbbbccccdddd")),
-        fullName = Customer.FullName("John Doe III"),
-        preferredName = Customer.PreferredName("Johnny"),
-        emailAddress = Customer.EmailAddress("johnny+company@gmail.com"),
-        phoneNumber = Customer.PhoneNumber("+12223334444"),
-        createdAt = Customer.CreatedAt(OffsetDateTime.of(2017, 8, 4, 0, 0, 0, 0, ZoneOffset.UTC)),
-        updatedAt = Customer.UpdatedAt(OffsetDateTime.of(2017, 8, 4, 0, 0, 0, 0, ZoneOffset.UTC)),
+            customerId = Customer.Id(UUID.fromString("00001111-2222-3333-aaaa-bbbbccccdddd")),
+            fullName = Customer.FullName("John Doe III"),
+            preferredName = Customer.PreferredName("Johnny"),
+            emailAddress = Customer.EmailAddress("johnny+company@gmail.com"),
+            phoneNumber = Customer.PhoneNumber("+12223334444"),
+            createdAt = Customer.CreatedAt(OffsetDateTime.of(2017, 8, 4, 0, 0, 0, 0, ZoneOffset.UTC)),
+            updatedAt = Customer.UpdatedAt(OffsetDateTime.of(2017, 8, 4, 0, 0, 0, 0, ZoneOffset.UTC)),
     )
-
 
 data class Customers(@JsonProperty("customers") val value: List<Customer>)
