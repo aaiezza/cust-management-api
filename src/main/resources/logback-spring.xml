@@ -1,8 +1,9 @@
 <configuration>
+    <springProperty scope="context" name="application" source="spring.application.name"/>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <fieldNames>
-                <context>context</context>
                 <level>level</level>
                 <message>message</message>
                 <logger>logger</logger>
@@ -10,13 +11,10 @@
                 <stackTrace>stackTrace</stackTrace>
                 <thread>thread</thread>
             </fieldNames>
-            <customFields>{"application":"${spring.application.name}"}</customFields>
         </encoder>
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
     </root>
-
-    <logger name="io.github.aaiezza" level="DEBUG" />
 </configuration>
