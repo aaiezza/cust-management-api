@@ -1,6 +1,7 @@
 package io.github.aaiezza.custman.customer.data
 
 import io.github.aaiezza.custman.customer.CustomerAlreadyExistsWithGivenEmailException
+import io.github.aaiezza.custman.customer.CustomerNotFoundException
 import io.github.aaiezza.custman.customer.models.Customer
 import io.github.aaiezza.custman.customer.models.UpdateCustomerRequest
 import io.github.aaiezza.custman.jooq.generated.Tables.CUSTOMER
@@ -31,7 +32,7 @@ class UpdateCustomerStatement(
                 .execute()
         }.let {
             if (it <= 0) {
-                error("Failed to update customer `${customerId.value}`")
+                throw CustomerNotFoundException(customerId, IllegalStateException("Failed to update customer"))
             }
         }
 

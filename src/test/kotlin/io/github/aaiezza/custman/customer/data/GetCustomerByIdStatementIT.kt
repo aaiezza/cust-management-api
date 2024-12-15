@@ -11,15 +11,16 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Import
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import java.util.*
 
 @SpringBootTest
-@ActiveProfiles("test") // Load application-test.properties
+@ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class GetCustomerByIdStatementIT(
-    @Autowired private val resetDatabaseStatement: ResetDatabaseStatement,
     @Autowired private val createCustomerStatement: CreateCustomerStatement,
+    @Autowired private val resetDatabaseStatement: ResetDatabaseStatement,
     @Autowired private val subject: GetCustomerByIdStatement
 ) {
     @BeforeEach
