@@ -9,8 +9,7 @@ import io.github.aaiezza.custman.jooq.generated.tables.FlywaySchemaHistory;
 import io.github.aaiezza.custman.jooq.generated.tables.records.CustomerRecord;
 import io.github.aaiezza.custman.jooq.generated.tables.records.FlywaySchemaHistoryRecord;
 
-import javax.annotation.processing.Generated;
-
+import org.jooq.Generated;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;

@@ -9,8 +9,7 @@ import io.github.aaiezza.custman.jooq.generated.tables.Customer;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-import javax.annotation.processing.Generated;
-
+import org.jooq.Generated;
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
 

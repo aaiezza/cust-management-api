@@ -14,10 +14,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.processing.Generated;
-
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.Generated;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.PlainSQL;

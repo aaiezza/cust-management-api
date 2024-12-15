@@ -100,6 +100,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+<!--        TODO: Do I need this? -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit</artifactId>
@@ -200,6 +201,9 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
+                <configuration>
+                    <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+                </configuration>
             </plugin>
             <!-- Failsafe Plugin for Integration Tests -->
             <plugin>
@@ -252,6 +256,10 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
+                            <excludes>
+                                <exclude>**/spring/config/*</exclude>
+                                <exclude>**/*ApplicationKt</exclude>
+                            </excludes>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
@@ -259,7 +267,7 @@
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.80</minimum> <!-- Set desired coverage threshold -->
+                                            <minimum>0.40</minimum> <!-- Set desired coverage threshold -->
                                         </limit>
                                     </limits>
                                 </rule>

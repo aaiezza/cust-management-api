@@ -7,9 +7,8 @@ package io.github.aaiezza.custman.jooq.generated;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.processing.Generated;
-
 import org.jooq.Constants;
+import org.jooq.Generated;
 import org.jooq.Schema;
 import org.jooq.impl.CatalogImpl;
 

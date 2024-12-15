@@ -18,6 +18,7 @@
         <generate>
             <kotlinNotNullPojoAttributes>true</kotlinNotNullPojoAttributes>
             <generatedAnnotation>true</generatedAnnotation>
+            <generatedAnnotationType>ORG_JOOQ_GENERATED</generatedAnnotationType>
             <javaTimeTypes>true</javaTimeTypes>
         </generate>
     </generator>

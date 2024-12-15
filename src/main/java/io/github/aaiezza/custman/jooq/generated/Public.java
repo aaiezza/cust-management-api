@@ -10,9 +10,8 @@ import io.github.aaiezza.custman.jooq.generated.tables.FlywaySchemaHistory;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.processing.Generated;
-
 import org.jooq.Catalog;
+import org.jooq.Generated;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
 

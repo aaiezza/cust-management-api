@@ -7,8 +7,7 @@ package io.github.aaiezza.custman.jooq.generated;
 import io.github.aaiezza.custman.jooq.generated.tables.Customer;
 import io.github.aaiezza.custman.jooq.generated.tables.FlywaySchemaHistory;
 
-import javax.annotation.processing.Generated;
-
+import org.jooq.Generated;
 import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.DSL;

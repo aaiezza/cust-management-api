@@ -15,10 +15,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.processing.Generated;
-
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.Generated;
 import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
