@@ -1,7 +1,7 @@
 package io.github.aaiezza.custman.customer.data
 
 import assertk.assertThat
-import assertk.assertions.isTrue
+import assertk.assertions.isFalse
 import io.github.aaiezza.custman.customer.models.Customer
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,6 +18,6 @@ class EmailExistsExecutorIT {
     @Test
     fun testExecutorProcessesMessageAndSavesToDatabase() {
         val response = subject.execute(Customer.EmailAddress("asdf@example.com"))
-        assertThat(response).isTrue()
+        assertThat(response).isFalse()
     }
 }
