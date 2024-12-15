@@ -6,7 +6,7 @@ import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 
 @Service
-class GetCustomerByEmailAddressExecutor(
+class GetCustomerByEmailAddressStatement(
     private val dslContext: DSLContext
 ) {
     fun execute(emailAddress: Customer.EmailAddress): Customer? =

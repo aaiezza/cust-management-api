@@ -19,19 +19,19 @@ import java.util.*
 class CustomerControllerTest {
 
     // Mock all required executors
-    private val getAllCustomersExecutor: GetAllCustomersExecutor = mockk()
-    private val createCustomerExecutor: CreateCustomerExecutor = mockk()
-    private val getCustomerByIdExecutor: GetCustomerByIdExecutor = mockk()
-    private val updateCustomerExecutor: UpdateCustomerExecutor = mockk()
-    private val softDeleteCustomerExecutor: SoftDeleteCustomerExecutor = mockk()
+    private val getAllCustomersStatement: GetAllCustomersStatement = mockk()
+    private val createCustomerStatement: CreateCustomerStatement = mockk()
+    private val getCustomerByIdStatement: GetCustomerByIdStatement = mockk()
+    private val updateCustomerStatement: UpdateCustomerStatement = mockk()
+    private val softDeleteCustomerStatement: SoftDeleteCustomerStatement = mockk()
 
     // Instantiate the controller with mocked executors
     private val customerController = CustomerController(
-        getAllCustomersExecutor,
-        createCustomerExecutor,
-        getCustomerByIdExecutor,
-        updateCustomerExecutor,
-        softDeleteCustomerExecutor
+        getAllCustomersStatement,
+        createCustomerStatement,
+        getCustomerByIdStatement,
+        updateCustomerStatement,
+        softDeleteCustomerStatement
     )
 
     @Test
@@ -40,7 +40,7 @@ class CustomerControllerTest {
         val createRequest = CreateCustomerRequest.sample
         val createdCustomer = Customer.sample
 
-        every { createCustomerExecutor.execute(createRequest) } returns createdCustomer
+        every { createCustomerStatement.execute(createRequest) } returns createdCustomer
 
         // Act
         val response: ResponseEntity<*> = customerController.createCustomer(createRequest)
@@ -50,7 +50,7 @@ class CustomerControllerTest {
         assertThat(response.body).isEqualTo(createdCustomer)
 
         // Verify
-        verify(exactly = 1) { createCustomerExecutor.execute(createRequest) }
+        verify(exactly = 1) { createCustomerStatement.execute(createRequest) }
     }
 
     @Test
@@ -61,7 +61,7 @@ class CustomerControllerTest {
             Customer.sample.copy(customerId = Customer.Id(UUID.randomUUID()))
         ).let(::Customers)
 
-        every { getAllCustomersExecutor.execute() } returns customers
+        every { getAllCustomersStatement.execute() } returns customers
 
         // Act
         val response: ResponseEntity<Customers> = customerController.getAllCustomers()
@@ -71,7 +71,7 @@ class CustomerControllerTest {
         assertThat(response.body).isEqualTo(customers)
 
         // Verify
-        verify(exactly = 1) { getAllCustomersExecutor.execute() }
+        verify(exactly = 1) { getAllCustomersStatement.execute() }
     }
 
     @Test
@@ -80,7 +80,7 @@ class CustomerControllerTest {
         val customerId = Customer.sample.customerId
         val customer = Customer.sample
 
-        every { getCustomerByIdExecutor.execute(customerId) } returns customer
+        every { getCustomerByIdStatement.execute(customerId) } returns customer
 
         // Act
         val response: ResponseEntity<Customer> = customerController.getCustomerById(customerId.value.toString())
@@ -90,7 +90,7 @@ class CustomerControllerTest {
         assertThat(response.body).isEqualTo(customer)
 
         // Verify
-        verify(exactly = 1) { getCustomerByIdExecutor.execute(customerId) }
+        verify(exactly = 1) { getCustomerByIdStatement.execute(customerId) }
     }
 
     @Test
@@ -98,7 +98,7 @@ class CustomerControllerTest {
         // Arrange
         val customerId = Customer.Id(UUID.randomUUID())
 
-        every { getCustomerByIdExecutor.execute(customerId) } returns null
+        every { getCustomerByIdStatement.execute(customerId) } returns null
 
         // Act
         val response: ResponseEntity<Customer> = customerController.getCustomerById(customerId.value.toString())
@@ -108,7 +108,7 @@ class CustomerControllerTest {
         assertThat(response.body).isNull()
 
         // Verify
-        verify(exactly = 1) { getCustomerByIdExecutor.execute(customerId) }
+        verify(exactly = 1) { getCustomerByIdStatement.execute(customerId) }
     }
 
     @Test
@@ -116,7 +116,7 @@ class CustomerControllerTest {
         // Arrange
         val customerId = Customer.sample.customerId
 
-        every { softDeleteCustomerExecutor.execute(customerId) } returns true
+        every { softDeleteCustomerStatement.execute(customerId) } returns true
 
         // Act
         val response: ResponseEntity<Void> = customerController.deleteCustomer(customerId.value.toString())
@@ -125,6 +125,6 @@ class CustomerControllerTest {
         assertThat(response.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
 
         // Verify
-        verify(exactly = 1) { softDeleteCustomerExecutor.execute(customerId) }
+        verify(exactly = 1) { softDeleteCustomerStatement.execute(customerId) }
     }
 }

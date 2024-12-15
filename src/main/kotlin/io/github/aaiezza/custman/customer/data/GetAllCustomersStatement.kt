@@ -1,19 +1,21 @@
 package io.github.aaiezza.custman.customer.data
 
 import io.github.aaiezza.custman.customer.models.Customer
+import io.github.aaiezza.custman.customer.models.Customers
 import io.github.aaiezza.custman.jooq.generated.Tables.CUSTOMER
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 
 @Service
-class GetCustomerByIdExecutor(
+class GetAllCustomersStatement(
     private val dslContext: DSLContext
 ) {
-    fun execute(customerId: Customer.Id): Customer? =
+    fun execute(): Customers =
         dslContext.select()
             .from(CUSTOMER)
-            .where(CUSTOMER.CUSTOMER_ID.eq(customerId.value).and(CUSTOMER.DELETED_AT.isNull))
-            .fetchOne {
+            .where(CUSTOMER.DELETED_AT.isNull())
+            .orderBy(CUSTOMER.UPDATED_AT.desc())
+            .fetch {
                 Customer(
                     customerId = Customer.Id(it.getValue(CUSTOMER.CUSTOMER_ID)),
                     fullName = Customer.FullName(it.getValue(CUSTOMER.FULL_NAME)),
@@ -23,6 +25,6 @@ class GetCustomerByIdExecutor(
                     createdAt = Customer.CreatedAt(it.getValue(CUSTOMER.CREATED_AT)),
                     updatedAt = Customer.UpdatedAt(it.getValue(CUSTOMER.UPDATED_AT))
                 )
-            }
+            }.let(::Customers)
 }
 

@@ -8,14 +8,14 @@ import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 
 @Service
-class UpdateCustomerExecutor(
-    private val getCustomerByIdExecutor: GetCustomerByIdExecutor,
-    private val getCustomerByEmailAddressExecutor: GetCustomerByEmailAddressExecutor,
+class UpdateCustomerStatement(
+    private val getCustomerByIdStatement: GetCustomerByIdStatement,
+    private val getCustomerByEmailAddressStatement: GetCustomerByEmailAddressStatement,
     private val dslContext: DSLContext
 ) {
     // TODO: Add logging
     fun execute(customerId: Customer.Id, request: UpdateCustomerRequest): Customer {
-        val existingCustomer = getCustomerByEmailAddressExecutor.execute(request.emailAddress)
+        val existingCustomer = getCustomerByEmailAddressStatement.execute(request.emailAddress)
 
         if (existingCustomer != null && existingCustomer.customerId != customerId) {
             throw CustomerAlreadyExistsWithGivenEmailException(request.emailAddress)
@@ -36,7 +36,7 @@ class UpdateCustomerExecutor(
         }
 
         // TODO: add logging
-        return getCustomerByIdExecutor.execute(customerId)
+        return getCustomerByIdStatement.execute(customerId)
             ?: error { "Failed to get customer after update `${customerId.value}`" }
     }
 }

@@ -9,13 +9,13 @@ import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 
 @Service
-class CreateCustomerExecutor(
-    private val emailExistsExecutor: EmailExistsExecutor,
+class CreateCustomerStatement(
+    private val emailExistsStatement: EmailExistsStatement,
     private val dslContext: DSLContext
 ) {
     // TODO: Add logging
     fun execute(request: CreateCustomerRequest): Customer {
-        if (emailExistsExecutor.execute(request.emailAddress)) {
+        if (emailExistsStatement.execute(request.emailAddress)) {
             throw CustomerAlreadyExistsWithGivenEmailException(request.emailAddress)
         }
         val customer = request.toCustomerStub()

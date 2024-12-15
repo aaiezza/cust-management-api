@@ -7,7 +7,7 @@ import org.jooq.impl.DSL
 import org.springframework.stereotype.Service
 
 @Service
-class SoftDeleteCustomerExecutor(
+class SoftDeleteCustomerStatement(
     private val dslContext: DSLContext
 ) {
     fun execute(customerId: Customer.Id): Boolean {

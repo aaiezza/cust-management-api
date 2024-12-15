@@ -10,10 +10,10 @@ import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
 @ActiveProfiles("test")
-class EmailExistsExecutorIT {
+class EmailExistsStatementIT {
 
     @Autowired
-    private lateinit var subject: EmailExistsExecutor
+    private lateinit var subject: EmailExistsStatement
 
     @Test
     fun testExecutorProcessesMessageAndSavesToDatabase() {

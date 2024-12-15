@@ -6,7 +6,7 @@ import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 
 @Service
-class EmailExistsExecutor(
+class EmailExistsStatement(
     private val dslContext: DSLContext
 ) {
     // TODO: Add logging
