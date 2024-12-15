@@ -1,4 +1,4 @@
-<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.15.0.xsd">
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.19.8.xsd">
     <jdbc>
         <driver>org.postgresql.Driver</driver>
         <url>jdbc:postgresql://database:5432/customer_db</url>
@@ -7,37 +7,18 @@
     </jdbc>
     <generator>
         <name>org.jooq.codegen.DefaultGenerator</name>
-        <strategy>
-            <name>org.jooq.codegen.DefaultGeneratorStrategy</name>
-        </strategy>
         <database>
             <name>org.jooq.meta.postgres.PostgresDatabase</name>
             <inputSchema>public</inputSchema>
-            <forcedTypes>
-                <forcedType>
-                    <name>LocalDateTime</name>
-                    <types>.*TIMESTAMP.*</types>
-                </forcedType>
-            </forcedTypes>
         </database>
         <target>
             <packageName>io.github.aaiezza.custman.jooq.generated</packageName>
             <directory>src/main/java</directory>
         </target>
         <generate>
-            <annotations>true</annotations>
+            <kotlinNotNullPojoAttributes>true</kotlinNotNullPojoAttributes>
+            <generatedAnnotation>true</generatedAnnotation>
+            <javaTimeTypes>true</javaTimeTypes>
         </generate>
-        <strategy>
-            <matchers>
-                <tables>
-                    <matcher>
-                        <expression>.*</expression>
-                        <annotation>
-                            <annotation>@javax.annotation.processing.Generated("JOOQ")</annotation>
-                        </annotation>
-                    </matcher>
-                </tables>
-            </matchers>
-        </strategy>
     </generator>
 </configuration>

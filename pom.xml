@@ -88,14 +88,6 @@
             <version>${jooq.version}</version>
         </dependency>
 
-        <!-- Annotations for jOOQ-generated code -->
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.2</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -267,7 +259,7 @@
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.24</minimum> <!-- Set desired coverage threshold -->
+                                            <minimum>0.80</minimum> <!-- Set desired coverage threshold -->
                                         </limit>
                                     </limits>
                                 </rule>
