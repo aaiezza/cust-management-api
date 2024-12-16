@@ -28,7 +28,7 @@ abstract class BaseLogEvent private constructor(
         get() = this::class.simpleName ?: "UnknownAction"
 }
 
-private val logger = KotlinLogging.logger {}
+private val logger = KotlinLogging.logger("io.github.aaiezza.EventLogger")
 
 private fun LogEvent.log(logger: (message: () -> Any?) -> Unit) {
     MDC.put("event_id", eventId.toString())

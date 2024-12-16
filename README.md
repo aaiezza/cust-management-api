@@ -19,14 +19,12 @@ This project provides a RESTful API for managing customer data. It uses **Kotlin
 
 - [Architecture Overview](#architecture-overview)
 - [Setup and Prerequisites](#setup-and-prerequisites)
-- [Database Configuration](#database-configuration)
 - [Running the Application](#running-the-application)
-- [Usage](#usage)
 - [API Documentation](#api-documentation)
 - [Testing](#testing)
 - [CI/CD and Deployment](#cicd-and-deployment)
 - [Kubernetes](#kubernetes)
-    - [Deploying Locally](#deploying-locally)
+   - [Deploying Locally](#deploying-locally)
 - [Contributing](#contributing)
 
 ---
@@ -97,7 +95,8 @@ sequenceDiagram
 1. **Java 21+**: Install from [Amazon Corretto](https://aws.amazon.com/corretto/) or your package manager.
 2. **Maven 3.8+**: Verify installation with `mvn -v`.
 3. **Docker & Docker Compose**: For running Postgres and Newman tests easily.
-4. **Postgres**: Run locally or via Docker.
+4. **kubectl**: Command-line tool for Kubernetes.
+5. **Minikube**: Local Kubernetes cluster for testing.
 
 ### Repository
 
@@ -110,33 +109,9 @@ cd customer-management-api
 
 ---
 
-## Database Configuration
-
-Start the database:
-
-```bash
-docker-compose up -d
-```
-
-Environment Variables (in `.env` or your environment):
-
-```env
-DATABASE_URL=jdbc:postgresql://localhost:5432/customer_db
-DATABASE_USER=customer_user
-DATABASE_PASSWORD=customer_pass
-```
-
-Reset the local database:
-```bash
-docker-compose down
-docker volume rm customer-management-api_postgres_data
-docker-compose up database --build -d
-mvn flyway:migrate -P flyway
-```
-
----
-
 ## Running the Application
+
+### Local Development
 
 Build the project:
 
@@ -152,26 +127,52 @@ mvn spring-boot:run
 
 The API is now available at: [http://localhost:8080](http://localhost:8080)
 
-To containerize:
+### Local Development with Docker Compose
 
-```bash
-docker build -t aaiezza/customer-management-api .
-docker run -p 8080:8080 --env-file .env aaiezza/customer-management-api
-```
+Alternatively, you can use Docker Compose to run the application along with Postgres locally:
 
----
+1. Ensure Docker is running.
+2. Run the following command:
 
-## Usage
+   ```bash
+   docker-compose up app
+   ```
 
-**Endpoints:**
+This will build and run the Spring Boot application, as well as a Postgres database.
 
-- **Create a Customer**: `POST /customers`
-- **List Customers**: `GET /customers`
-- **Get Customer by ID**: `GET /customers/{id}`
-- **Update a Customer**: `PUT /customers/{id}`
-- **Delete a Customer**: `DELETE /customers/{id}`
+The API will be available at: [http://localhost:8080](http://localhost:8080)
 
-Use `curl`, Postman, or any HTTP client to interact with the API.
+### Local Kubernetes Deployment
+
+Ensure **Minikube** and **kubectl** are installed and configured.
+
+1. **Start Minikube:**
+   ```bash
+   minikube start --memory=6144 --cpus=4
+   ```
+
+2. **Run the Startup Script:**
+   Execute the provided script to set up the project in Minikube:
+   ```bash
+   ./scripts/start-kubernetes.sh
+   ```
+
+3. **Access the Application:**
+   Retrieve the Minikube service URL:
+   ```bash
+   minikube service customer-management-api --url
+   ```
+
+4. **Monitor Application Pods:**
+   ```bash
+   kubectl get pods --watch
+   ```
+
+5. **Shut Down the Environment:**
+   To stop and clean up Minikube resources, run:
+   ```bash
+   ./scripts/shutdown-kubernetes.sh
+   ```
 
 ---
 
@@ -210,9 +211,6 @@ url: "../openapi.yaml"
 
 jOOQ generates type-safe database schema classes. To run the code generation:
 
-1. Ensure the database is running and reachable.
-2. Run the following Maven command:
-
    ```bash
    mvn clean install -Pjooq-codegen
    ```
@@ -223,19 +221,26 @@ This will generate the database schema classes in `target/generated-sources/jooq
 
 ## Testing
 
-1. **Unit Tests**:
+### Unit Tests
+
+Run unit tests:
+
+```bash
+mvn test
+```
+
+### Acceptance Tests (Postman + Newman)
+
+To simplify acceptance testing, you can leverage the provided `docker-compose` configuration to run Newman:
+
+1. Ensure Docker is running.
+2. Run the acceptance tests with:
 
    ```bash
-   mvn test
+   docker-compose up postman
    ```
 
-2. **Acceptance Tests (Postman + Newman)**:
-
-    - Ensure `postman/collection.json` is available.
-    - Run with Newman:
-      ```bash
-      docker run -v $(pwd)/postman:/etc/newman postman/newman run /etc/newman/collection.json
-      ```
+This will execute the Postman collection against the running API and generate a report.
 
 ---
 
@@ -244,154 +249,58 @@ This will generate the database schema classes in `target/generated-sources/jooq
 **GitHub Actions Workflow:**
 
 - Set up a workflow in `.github/workflows/ci.yml` that triggers on merges to `main`.
-    - Steps:
-        1. Checkout code.
-        2. Set up Java and build with Maven.
-        3. Run unit and acceptance tests.
-        4. Build and push Docker image to a registry.
-        5. Deploy to test or prod environments if configured.
+   - Steps:
+      1. Checkout code.
+      2. Set up Java and build with Maven.
+      3. Run unit and acceptance tests.
+      4. Build and push Docker image to a registry.
+      5. Deploy to test or prod environments if configured.
 
 ---
 
 ## Kubernetes
 
-To deploy to Kubernetes:
+### Setting Up Secrets
 
-1. Create `deployment.yaml` and `service.yaml` in `k8s/`:
+Before running the project, create a `secrets.yaml` file for your credentials:
 
-   ```yaml
-   apiVersion: apps/v1
-   kind: Deployment
-   metadata:
-     name: customer-management-api
-   spec:
-     replicas: 2
-     selector:
-       matchLabels:
-         app: customer-management-api
-     template:
-       metadata:
-         labels:
-           app: customer-management-api
-       spec:
-         containers:
-         - name: customer-management-api
-           image: aaiezza/customer-management-api:latest
-           ports:
-           - containerPort: 8080
-   ```
+1. Copy `secrets.yaml.template` to `secrets.yaml`.
+2. Replace `<base64-encoded-username>` and `<base64-encoded-token>` with your Base64-encoded Git credentials.
+   - Use the following commands to encode your credentials:
+     ```
+     echo -n 'your-username' | base64
+     echo -n 'your-token' | base64
+     ```
+3. Save the file in the same directory as the template.
 
-2. Deploy:
-
-   ```bash
-   kubectl apply -f k8s/
-   ```
-
-3. Access the application via `kubectl port-forward` or a LoadBalancer/Ingress.
+**Important**: Do not commit `secrets.yaml` to the repository. It is excluded by `.gitignore`.
 
 ### Deploying Locally
 
-To deploy the application locally using Kubernetes:
-
 1. **Start Minikube:**
    ```bash
-   minikube start
+   minikube start --memory=6144 --cpus=4
    ```
 
-2. **Load the Docker image into Minikube:**
+2. **Run the Startup Script:**
    ```bash
-   minikube image load aaiezza/customer-management-api:latest
+   ./scripts/start-kubernetes.sh
    ```
 
-3. **Apply the Kubernetes Manifests:**
+3. **Monitor Application Status:**
    ```bash
-   kubectl apply -f k8s/
+   kubectl get pods
    ```
 
-4. **Access the Application:**
-   Use `kubectl port-forward` to expose the application locally:
-   ```bash
-   kubectl port-forward service/customer-management-api 8080:8080
-   ```
-
-   Alternatively, enable the Minikube service tunnel:
+4. **Access the Service:**
    ```bash
    minikube service customer-management-api
    ```
 
-5. **Verify Deployment:**
-   Check the status of the pods:
+5. **Shut Down the Environment:**
    ```bash
-   kubectl get pods
+   ./scripts/shutdown-kubernetes.sh
    ```
-   Ensure all pods are in the `Running` state.
-
-6. **Watch the Pods:**
-   To monitor the state of pods in real time, use:
-   ```bash
-   kubectl get pods --watch
-   ```
-
-7. **Rollout and Restart:**
-   If you need to deploy updated code or configurations, perform a rollout restart:
-   ```bash
-   kubectl rollout restart deployment/customer-management-api
-   ```
-   To check the status of the rollout:
-   ```bash
-   kubectl rollout status deployment/customer-management-api
-   ```
-
-8. **Run Flyway Migrations:**
-   To apply Flyway migrations to the Postgres database deployed in Kubernetes, use a Kubernetes job or a local Flyway container.
-
-   **Option 1: Run as a Kubernetes Job**
-   ```bash
-   kubectl create job flyway-migration --image=flyway/flyway -- \
-   -url=jdbc:postgresql://postgres-service:5432/customer_db \
-   -user=customer_user -password=customer_pass migrate
-   ```
-
-   **Option 2: Run Flyway Locally (with Port Forwarding)**
-   ```bash
-   kubectl port-forward service/postgres-service 5432:5432
-   docker run --rm -v $(pwd)/sql:/flyway/sql flyway/flyway:latest \
-   -url=jdbc:postgresql://localhost:5432/customer_db \
-   -user=customer_user -password=customer_pass migrate
-   ```
-
-1. **Start Minikube:**
-   ```bash
-   minikube start
-   ```
-
-2. **Load the Docker image into Minikube:**
-   ```bash
-   minikube image load aaiezza/customer-management-api:latest
-   ```
-
-3. **Apply the Kubernetes Manifests:**
-   ```bash
-   kubectl apply -f k8s/
-   ```
-
-4. **Access the Application:**
-   Use `kubectl port-forward` to expose the application locally:
-   ```bash
-   kubectl port-forward service/customer-management-api 8080:8080
-   ```
-
-   Alternatively, enable the Minikube service tunnel:
-   ```bash
-   minikube service customer-management-api
-   ```
-
-5. **Verify Deployment:**
-   Check the status of the pods:
-   ```bash
-   kubectl get pods
-   ```
-   Ensure all pods are in the `Running` state.
 
 ---
 
@@ -401,4 +310,3 @@ To deploy the application locally using Kubernetes:
 2. Commit changes with descriptive messages.
 3. Open a Pull Request against `main`.
 4. Contributions are welcomed and reviewed promptly.
-

@@ -20,6 +20,14 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            failureThreshold: 5
+            timeoutSeconds: 5
           env:
             - name: SPRING_DATASOURCE_URL
               value: "jdbc:postgresql://postgres-service:5432/customer_db"

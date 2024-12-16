@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: app-image-build
+spec:
+  parallelism: 1
+  backoffLimit: 0
+  template:
+    spec:
+      containers:
+        - name: maven-build
+          image: maven:3.9.9-amazoncorretto-21-alpine
+          command:
+            - /bin/sh
+            - -c
+            - >
+              apk add --no-cache git &&
+              git clone https://$(TOKEN)@github.com/aaiezza/customer-management-api.git /usr/src/app &&
+              cd /usr/src/app &&
+              mvn clean install -DskipTests
+          env:
+            - name: TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: git-credentials
+                  key: token
+          volumeMounts:
+            - name: maven-repo
+              mountPath: /root/.m2
+      restartPolicy: Never
+      volumes:
+        - name: maven-repo
+          emptyDir: {}

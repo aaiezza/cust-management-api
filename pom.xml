@@ -93,19 +93,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.mockito</groupId>-->
-<!--                    <artifactId>mockito-core</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-        </dependency>
-<!--        TODO: Do I need this? -->
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test-junit</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.willowtreeapps.assertk</groupId>
@@ -203,7 +190,9 @@
                 <version>3.5.2</version>
                 <configuration>
                     <!--suppress UnresolvedMavenProperty -->
-                    <argLine>@{argLine} -javaagent:${net.bytebuddy:byte-buddy-agent:jar} -javaagent:${org.mockito:mockito-core:jar}</argLine>
+                    <argLine>@{argLine} -javaagent:${net.bytebuddy:byte-buddy-agent:jar}
+                        -javaagent:${org.mockito:mockito-core:jar}
+                    </argLine>
                 </configuration>
             </plugin>
             <!-- Dependency Plugin allows for easier javaagent identification -->
@@ -234,7 +223,9 @@
                     <classesDirectory>target/classes</classesDirectory>
                     <testClassesDirectory>target/test-classes</testClassesDirectory>
                     <!--suppress UnresolvedMavenProperty -->
-                    <argLine>@{argLine} -javaagent:${net.bytebuddy:byte-buddy-agent:jar} -javaagent:${org.mockito:mockito-core:jar}</argLine>
+                    <argLine>@{argLine} -javaagent:${net.bytebuddy:byte-buddy-agent:jar}
+                        -javaagent:${org.mockito:mockito-core:jar}
+                    </argLine>
                 </configuration>
             </plugin>
 
@@ -290,7 +281,7 @@
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.40</minimum>
+                                            <minimum>0.80</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
@@ -354,4 +345,14 @@
             </build>
         </profile>
     </profiles>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>3.5.2</version>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

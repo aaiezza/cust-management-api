@@ -214,7 +214,7 @@
 	"variable": [
 		{
 			"key": "host",
-			"value": "http://localhost:8080",
+			"value": "http://app:8080",
 			"type": "string"
 		}
 	]

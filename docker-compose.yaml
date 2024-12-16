@@ -17,7 +17,7 @@ services:
       retries: 5
 
   flyway-migration:
-    image: maven:3.9.5-eclipse-temurin-21
+    image: maven:3.9.9-amazoncorretto-21-alpine
     container_name: maven_flyway_migration
     depends_on:
       database:
@@ -29,7 +29,7 @@ services:
     command: [ "mvn", "flyway:migrate", "-P", "flyway" ]
 
   jooq-codegen:
-    image: maven:3.8.8-eclipse-temurin-17
+    image: maven:3.9.9-amazoncorretto-21-alpine
     container_name: maven_jooq_codegen
     depends_on:
       database:
@@ -41,8 +41,11 @@ services:
     entrypoint: ["mvn", "generate-sources", "-P", "jooq-codegen"]
 
   maven-install:
-    image: maven:3.9.5-eclipse-temurin-21
+    image: maven:3.9.9-amazoncorretto-21-alpine
     container_name: maven_install_service
+    depends_on:
+      database:
+        condition: service_healthy
     volumes:
       - .:/usr/src/app
       - ~/.m2:/root/.m2
@@ -54,8 +57,37 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: customer_management_app
+    depends_on:
+      database:
+        condition: service_healthy
     ports:
       - "8080:8080"
+    healthcheck:
+      test:  ["CMD-SHELL", "curl -m 5 --silent --fail --request GET http://localhost:8080/actuator/health | jq --exit-status -n 'inputs | if has(\"status\") then .status==\"UP\" else false end' > /dev/null || exit 1"]
+      interval: 8s
+      timeout: 2s
+      retries: 10
+      start_period: 15s
+
+  postman:
+    image: dannydainton/htmlextra
+    container_name: postman_tests
+    command: >
+      run /etc/newman/acceptance_tests.postman_collection.json
+      --reporters cli,htmlextra
+      --reporter-htmlextra-export /etc/newman/reports/report.html
+      --reporter-htmlextra-title "Acceptance Test Report"
+      --reporter-htmlextra-title-size 2
+      --reporter-htmlextra-logs
+      --verbos
+    volumes:
+      - ./postman:/etc/newman
+      - ./target:/etc/newman/reports
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - default
 
 volumes:
   postgres_data:

@@ -16,5 +16,5 @@ CREATE TABLE customer (
 );
 
 -- Indexes for performance
-CREATE UNIQUE INDEX ux_customer_email_address ON customer(email_address) WHERE deleted_at IS NOT NULL;
+CREATE UNIQUE INDEX ux_customer_email_address ON customer(email_address) WHERE deleted_at IS NULL;
 CREATE INDEX ix_customer_phone ON customer (phone_number);
