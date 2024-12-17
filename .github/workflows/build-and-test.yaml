@@ -56,12 +56,30 @@ jobs:
       - name: Create Docker Network
         run: docker network create test-network
 
-      # Start the App Container
+      # Start the App Container with Health Check
       - name: Start App Container
         run: |
           docker run -d --name app --network test-network \
+            --health-cmd "curl --fail http://localhost:8080/actuator/health || exit 1" \
+            --health-interval 5s --health-retries 5 --health-timeout 3s \
             -p 8080:8080 customer-management-api
-          sleep 10  # Allow the app to start
+
+      # Wait for App Container to be Healthy
+      - name: Wait for App Health
+        run: |
+          echo "Waiting for app container to be healthy..."
+          for i in {1..10}; do
+            health=$(docker inspect --format='{{.State.Health.Status}}' app)
+            if [ "$health" = "healthy" ]; then
+              echo "App container is healthy!"
+              exit 0
+            fi
+            echo "App container status: $health. Retrying..."
+            sleep 5
+          done
+          echo "App container did not become healthy in time."
+          docker logs app
+          exit 1
 
       # Run Postman Tests with Newman
       - name: Run Postman Tests
