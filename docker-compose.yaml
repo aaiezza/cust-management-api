@@ -79,7 +79,7 @@ services:
       --reporter-htmlextra-title "Acceptance Test Report"
       --reporter-htmlextra-title-size 2
       --reporter-htmlextra-logs
-      --verbos
+      --verbose
     volumes:
       - ./postman:/etc/newman
       - ./target:/etc/newman/reports
