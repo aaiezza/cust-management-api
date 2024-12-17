@@ -21,14 +21,6 @@ jobs:
           java-version: '21'
           distribution: 'corretto'
 
-      # Set up Maven caching for faster builds
-      - name: Cache Maven Dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: maven-
-
       # Run Maven Build
       - name: Run Maven Build
         run: mvn clean package
@@ -56,24 +48,30 @@ jobs:
           name: maven-build
           path: target/
 
-      # Build Docker Image using the jar from target
+      # Build Docker Image
       - name: Build Docker Image
         run: docker build -t customer-management-api .
 
-      # Run the App Container
+      # Create a Docker Network
+      - name: Create Docker Network
+        run: docker network create test-network
+
+      # Start the App Container
       - name: Start App Container
         run: |
-          docker run -d --name app_container -p 8080:8080 customer-management-api
+          docker run -d --name app --network test-network \
+            -p 8080:8080 customer-management-api
           sleep 10  # Allow the app to start
 
       # Run Postman Tests with Newman
       - name: Run Postman Tests
         run: |
-          docker run --rm -v $(pwd)/postman:/etc/newman \
-            dannydainton/htmlextra run /etc/newman/acceptance_tests.postman_collection.json \
+          docker run --rm --network test-network \
+            -v $(pwd)/postman:/etc/newman dannydainton/htmlextra \
+            run /etc/newman/acceptance_tests.postman_collection.json \
             --reporters cli,htmlextra \
             --reporter-htmlextra-export /etc/newman/reports/report.html \
-            --env-var base_url=http://host.docker.internal:8080
+            --env-var base_url=http://app:8080
 
       # Upload Postman Test Report as Artifact
       - name: Upload Postman Test Report
@@ -81,3 +79,9 @@ jobs:
         with:
           name: postman-test-report
           path: postman/reports/report.html
+
+      # Clean up Docker Network and Containers
+      - name: Clean Up
+        run: |
+          docker stop app
+          docker network rm test-network
