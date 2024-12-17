@@ -5,6 +5,7 @@ import io.github.aaiezza.custman.customer.models.CreateCustomerRequest
 import io.github.aaiezza.custman.customer.models.Customer
 import io.github.aaiezza.custman.customer.models.toCustomerStub
 import io.github.aaiezza.custman.jooq.generated.Tables.CUSTOMER
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
@@ -14,9 +15,10 @@ class CreateCustomerStatement(
     private val emailExistsStatement: EmailExistsStatement,
     private val dslContext: DSLContext
 ) {
+    private val logger = KotlinLogging.logger(CreateCustomerStatement::class.qualifiedName.toString())
+
     fun execute(request: CreateCustomerRequest): Customer = execute(dslContext.configuration(), request)
 
-    // TODO: Add logging
     fun execute(configuration: Configuration, request: CreateCustomerRequest): Customer {
         if (emailExistsStatement.execute(configuration, request.emailAddress)) {
             throw CustomerAlreadyExistsWithGivenEmailException(request.emailAddress)
@@ -39,8 +41,10 @@ class CreateCustomerStatement(
                         it.emailAddress.value,
                         it.phoneNumber.value
                     )
-                    .returning(CUSTOMER.asterisk())
-                    .fetchOneInto(CUSTOMER)
+                    .returning(CUSTOMER.asterisk()).let { statement ->
+                        logger.trace { statement.sql }
+                        statement.fetchOneInto(CUSTOMER)
+                    }
             }
             ?.let {
                 Customer(
@@ -54,11 +58,9 @@ class CreateCustomerStatement(
                 )
             }
             ?: run {
-                // TODO: create custom exception and log
                 error { "Failed to insert customer" }
             }
 
-        // TODO: add logging
         return customer
     }
 }
