@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -103,7 +104,7 @@ class CustomerControllerTest {
 
         // Assert
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
-        assertThat(response.body).isEqualTo(mapOf("error" to CustomerNotFoundException(customerId).message))
+        assertThat(response.body).isEqualTo(mapOf("error_message" to CustomerNotFoundException(customerId).message))
 
         // Verify
         verify(exactly = 1) { getCustomerByIdStatement.execute(customerId) }
@@ -161,10 +162,34 @@ class CustomerControllerTest {
 
         // Assert
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
-        assertThat(response.body).isEqualTo(mapOf("error" to CustomerNotFoundException(customerId).message))
+        assertThat(response.body).isEqualTo(mapOf("error_message" to CustomerNotFoundException(customerId).message))
 
         // Verify
         verify(exactly = 1) { getCustomerByIdStatement.execute(customerId) }
         verify(exactly = 0) { updateCustomerStatement.execute(customerId, updateRequest) }
     }
+
+    @Test
+    fun `updateCustomer should return 409 CONFLICT when email address already exists`() {
+        // Arrange
+        val customerId = Customer.sample.customerId
+        val updateRequest = UpdateCustomerRequest.sample
+        val conflictException = CustomerAlreadyExistsWithGivenEmailException(
+            updateRequest.emailAddress ?: fail { "email address does not exist for test data" })
+
+        every { getCustomerByIdStatement.execute(customerId) } returns Customer.sample
+        every { updateCustomerStatement.execute(customerId, updateRequest) } throws conflictException
+
+        // Act
+        val response: ResponseEntity<*> = customerController.updateCustomer(customerId, updateRequest)
+
+        // Assert
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CONFLICT)
+        assertThat(response.body).isEqualTo(mapOf("error_message" to conflictException.message))
+
+        // Verify
+        verify(exactly = 1) { getCustomerByIdStatement.execute(customerId) }
+        verify(exactly = 1) { updateCustomerStatement.execute(customerId, updateRequest) }
+    }
+
 }

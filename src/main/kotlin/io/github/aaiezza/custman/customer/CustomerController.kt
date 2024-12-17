@@ -43,7 +43,7 @@ class CustomerController(
                     is CustomerAlreadyExistsWithGivenEmailException -> run {
                         CreateCustomerExceptionLogEvent(it, HttpMethod.POST, "/customer").error()
                         ResponseEntity.status(CONFLICT)
-                            .body(mapOf("error" to it.message))
+                            .errorMessageBody(it)
                     }
 
                     else -> throw it
@@ -57,7 +57,7 @@ class CustomerController(
             val ex = CustomerNotFoundException(customerId)
             GetCustomerExceptionLogEvent(customerId, ex, HttpMethod.GET, "/customer/${customerId.value}").error()
             ResponseEntity.status(NOT_FOUND)
-                .body(mapOf("error" to ex.message))
+                .errorMessageBody(ex)
         }
 
     @PutMapping("/{customerId}")
@@ -78,27 +78,25 @@ class CustomerController(
             .recover {
                 when (it) {
                     is CustomerAlreadyExistsWithGivenEmailException -> run {
-                        val ex = CustomerNotFoundException(customerId)
                         UpdateCustomerExceptionLogEvent(
                             customerId,
-                            ex,
+                            it,
                             HttpMethod.PUT,
                             "/customer/${customerId.value}"
                         ).error()
                         ResponseEntity.status(CONFLICT)
-                            .body(mapOf("error" to ex.message))
+                            .errorMessageBody(it)
                     }
 
                     is CustomerNotFoundException -> run {
-                        val ex = CustomerNotFoundException(customerId)
                         UpdateCustomerExceptionLogEvent(
                             customerId,
-                            ex,
+                            it,
                             HttpMethod.PUT,
                             "/customer/${customerId.value}"
                         ).error()
                         ResponseEntity.status(NOT_FOUND)
-                            .body(mapOf("error" to ex.message))
+                            .errorMessageBody(it)
                     }
 
                     else -> throw it
@@ -133,7 +131,7 @@ class GlobalExceptionHandler {
         UnhandledExceptionLogEvent(exception, request.method.let(HttpMethod::valueOf), request.contextPath).error()
         return ResponseEntity
             .status(INTERNAL_SERVER_ERROR)
-            .body(mapOf("error_message" to exception.message))
+            .errorMessageBody(exception)
     }
 
     // Handle bad user input - JSON format issues
@@ -145,32 +143,9 @@ class GlobalExceptionHandler {
         MalformedInputExceptionLogEvent(exception, request.method.let(HttpMethod::valueOf), request.contextPath).error()
         return ResponseEntity
             .status(BAD_REQUEST)
-            .body(mapOf("error_message" to "Malformed request: ${exception.message}"))
+            .errorMessageBody(exception)
     }
-
-//    // Handle argument validation errors
-//    @ExceptionHandler(MethodArgumentNotValidException::class)
-//    fun handleValidationException(exception: MethodArgumentNotValidException): ResponseEntity<*> {
-//        val errors = exception.bindingResult.allErrors.map { error ->
-//            (error as? FieldError)?.field to error.defaultMessage
-//        }.toMap()
-//
-//        BadInputLogEvent(exception).error()
-//        return ResponseEntity
-//            .status(BAD_REQUEST)
-//            .body(mapOf("error_message" to "Validation failed", "errors" to errors))
-//    }
-//
-//    // Handle path variable or query parameter type mismatch
-//    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
-//    fun handleTypeMismatchException(exception: MethodArgumentTypeMismatchException): ResponseEntity<*> {
-//        BadInputLogEvent(exception).error()
-//        return ResponseEntity
-//            .status(BAD_REQUEST)
-//            .body(
-//                mapOf(
-//                    "error_message" to "Invalid value '${exception.value}' for parameter '${exception.name}'"
-//                )
-//            )
-//    }
 }
+
+fun ResponseEntity.BodyBuilder.errorMessageBody(ex: Exception): ResponseEntity<*> =
+    body(mapOf("error_message" to "${ex.message}"))
