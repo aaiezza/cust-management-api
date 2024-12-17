@@ -31,7 +31,16 @@ jobs:
         run: |
           docker run --rm -v $(pwd)/postman:/etc/newman \
             dannydainton/htmlextra run /etc/newman/acceptance_tests.postman_collection.json \
-            --reporters cli --reporter-htmlextra-export /etc/newman/reports/report.html
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export /etc/newman/reports/report.html \
+            --env-var base_url=http://host.docker.internal:8080
+
+      # Upload Postman Test Report as Artifact
+      - name: Upload Postman Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: postman-test-report
+          path: postman/reports/report.html
 
       # Stop the App Container
       - name: Stop and Clean Up
