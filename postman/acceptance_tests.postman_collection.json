@@ -520,7 +520,7 @@
 	"variable": [
 		{
 			"key": "host",
-			"value": "http://app_container:8080",
+			"value": "http://app:8080",
 			"type": "string"
 		}
 	]

@@ -81,7 +81,6 @@ jobs:
             maven:3.9.9-amazoncorretto-21-alpine \
             mvn flyway:migrate -P flyway
 
-
       # Start the App Container with Health Check
       - name: Start App Container
         run: |
@@ -118,7 +117,8 @@ jobs:
             run /etc/newman/acceptance_tests.postman_collection.json \
             --reporters cli,htmlextra \
             --reporter-htmlextra-export /etc/newman/reports/report.html \
-            --env-var base_url=http://app:8080
+            --env-var host=http://app:8080
+      # TODO: actually _use_ this env-var in the future instead of the hardcoded one in the collection
 
       # Upload Postman Test Report as Artifact
       - name: Upload Postman Test Report
