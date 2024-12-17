@@ -2,16 +2,23 @@ package io.github.aaiezza.custman.customer
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import ch.qos.logback.classic.LoggerContext
+import ch.qos.logback.classic.joran.JoranConfigurator
 import io.github.aaiezza.custman.customer.data.*
 import io.github.aaiezza.custman.customer.models.*
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import java.net.URL
 import java.util.*
 
+@RestClientTest
 class CustomerControllerTest {
 
     // Mock all required executors
