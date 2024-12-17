@@ -1,0 +1,38 @@
+name: Postman API Tests
+
+on:
+  workflow_run:
+    workflows: ["Maven Build and Docker Image"]
+    types:
+      - completed
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-24.04
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Pull the built Docker image
+      - name: Load Docker Image
+        run: |
+          docker build -t customer-management-api .
+
+      # Run the App Container
+      - name: Start App Container
+        run: |
+          docker run -d --name app_container -p 8080:8080 customer-management-api
+          sleep 10  # Allow the app to start
+
+      # Run Postman Tests with Newman
+      - name: Run Postman Tests
+        run: |
+          docker run --rm -v $(pwd)/postman:/etc/newman \
+            dannydainton/htmlextra run /etc/newman/acceptance_tests.postman_collection.json \
+            --reporters cli --reporter-htmlextra-export /etc/newman/reports/report.html
+
+      # Stop the App Container
+      - name: Stop and Clean Up
+        run: docker stop app_container
