@@ -33,6 +33,13 @@ jobs:
       - name: Run Maven Build
         run: mvn clean package
 
-      # Build Docker Image
+      # Upload the target directory as an artifact
+      - name: Upload Maven Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-build
+          path: target/
+
+      # Build Docker Image using the uploaded jar
       - name: Build Docker Image
         run: docker build -t customer-management-api .

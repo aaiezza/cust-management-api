@@ -15,10 +15,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Pull the built Docker image
-      - name: Load Docker Image
-        run: |
-          docker build -t customer-management-api .
+      # Download Maven Build Artifacts
+      - name: Download Maven Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-build
+          path: target/
+
+      # Build Docker Image using the jar from target
+      - name: Build Docker Image
+        run: docker build -t customer-management-api .
 
       # Run the App Container
       - name: Start App Container
@@ -41,7 +47,3 @@ jobs:
         with:
           name: postman-test-report
           path: postman/reports/report.html
-
-      # Stop the App Container
-      - name: Stop and Clean Up
-        run: docker stop app_container
