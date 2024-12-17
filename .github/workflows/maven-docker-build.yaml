@@ -1,4 +1,4 @@
-name: Maven Build and Docker Compose
+name: Maven Build and Docker Image
 
 on:
   push:
@@ -36,11 +36,3 @@ jobs:
       # Build Docker Image
       - name: Build Docker Image
         run: docker build -t customer-management-api .
-
-      # Run Docker Compose Services
-      - name: Start Services with Docker Compose
-        run: docker-compose up -d
-
-      # Stop and Clean Up Docker Compose
-      - name: Stop Docker Compose Services
-        run: docker-compose down
