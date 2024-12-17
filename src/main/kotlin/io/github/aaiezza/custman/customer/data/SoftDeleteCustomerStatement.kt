@@ -2,6 +2,7 @@ package io.github.aaiezza.custman.customer.data
 
 import io.github.aaiezza.custman.customer.models.Customer
 import io.github.aaiezza.custman.jooq.generated.Tables.CUSTOMER
+import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Service
@@ -10,8 +11,10 @@ import org.springframework.stereotype.Service
 class SoftDeleteCustomerStatement(
     private val dslContext: DSLContext
 ) {
-    fun execute(customerId: Customer.Id): Boolean {
-        val rowsUpdated = dslContext.update(CUSTOMER)
+    fun execute(customerId: Customer.Id) = execute(dslContext.configuration(), customerId)
+
+    fun execute(configuration: Configuration, customerId: Customer.Id): Boolean {
+        val rowsUpdated = configuration.dsl().update(CUSTOMER)
             .set(CUSTOMER.DELETED_AT, DSL.currentOffsetDateTime())
             .where(CUSTOMER.CUSTOMER_ID.eq(customerId.uuid).and(CUSTOMER.DELETED_AT.isNull))
             .execute()

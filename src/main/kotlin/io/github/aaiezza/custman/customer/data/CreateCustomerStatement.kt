@@ -5,6 +5,7 @@ import io.github.aaiezza.custman.customer.models.CreateCustomerRequest
 import io.github.aaiezza.custman.customer.models.Customer
 import io.github.aaiezza.custman.customer.models.toCustomerStub
 import io.github.aaiezza.custman.jooq.generated.Tables.CUSTOMER
+import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 
@@ -13,14 +14,16 @@ class CreateCustomerStatement(
     private val emailExistsStatement: EmailExistsStatement,
     private val dslContext: DSLContext
 ) {
+    fun execute(request: CreateCustomerRequest): Customer = execute(dslContext.configuration(), request)
+
     // TODO: Add logging
-    fun execute(request: CreateCustomerRequest): Customer {
+    fun execute(configuration: Configuration, request: CreateCustomerRequest): Customer {
         if (emailExistsStatement.execute(request.emailAddress)) {
             throw CustomerAlreadyExistsWithGivenEmailException(request.emailAddress)
         }
         val customer = request.toCustomerStub()
             .let {
-                dslContext
+                configuration.dsl()
                     .insertInto(CUSTOMER)
                     .columns(
                         CUSTOMER.CUSTOMER_ID,

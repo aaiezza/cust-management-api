@@ -2,6 +2,7 @@ package io.github.aaiezza.custman.customer.data
 
 import io.github.aaiezza.custman.customer.models.Customer
 import io.github.aaiezza.custman.jooq.generated.Tables.CUSTOMER
+import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 
@@ -9,20 +10,12 @@ import org.springframework.stereotype.Service
 class GetCustomerByIdStatement(
     private val dslContext: DSLContext
 ) {
-    fun execute(customerId: Customer.Id): Customer? =
-        dslContext.select()
+    fun execute(customerId: Customer.Id) = execute(dslContext.configuration(), customerId)
+
+    fun execute(configuration: Configuration, customerId: Customer.Id): Customer? =
+        configuration.dsl().select()
             .from(CUSTOMER)
             .where(CUSTOMER.CUSTOMER_ID.eq(customerId.uuid).and(CUSTOMER.DELETED_AT.isNull))
-            .fetchOne {
-                Customer(
-                    customerId = Customer.Id(it.getValue(CUSTOMER.CUSTOMER_ID)),
-                    fullName = Customer.FullName(it.getValue(CUSTOMER.FULL_NAME)),
-                    preferredName = Customer.PreferredName(it.getValue(CUSTOMER.PREFERRED_NAME)),
-                    emailAddress = Customer.EmailAddress(it.getValue(CUSTOMER.EMAIL_ADDRESS)),
-                    phoneNumber = Customer.PhoneNumber(it.getValue(CUSTOMER.PHONE_NUMBER)),
-                    createdAt = Customer.CreatedAt(it.getValue(CUSTOMER.CREATED_AT)),
-                    updatedAt = Customer.UpdatedAt(it.getValue(CUSTOMER.UPDATED_AT))
-                )
-            }
+            .fetchOneInto(CUSTOMER)?.toCustomer()
 }
 
