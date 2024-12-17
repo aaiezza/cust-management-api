@@ -7,9 +7,9 @@ import io.github.aaiezza.custman.customer.models.Customers
 import io.github.aaiezza.custman.customer.models.UpdateCustomerRequest
 import io.github.aaiezza.klogging.error
 import io.github.aaiezza.klogging.info
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
-import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -129,8 +129,8 @@ class CustomerController(
 class GlobalExceptionHandler {
     // Handle generic unhandled exceptions
     @ExceptionHandler(Exception::class)
-    fun handleGenericException(exception: Exception, request: HttpRequest): ResponseEntity<*> {
-        UnhandledExceptionLogEvent(exception, request.method, request.uri.path).error()
+    fun handleGenericException(exception: Exception, request: HttpServletRequest): ResponseEntity<*> {
+        UnhandledExceptionLogEvent(exception, request.method.let(HttpMethod::valueOf), request.contextPath).error()
         return ResponseEntity
             .status(INTERNAL_SERVER_ERROR)
             .body(mapOf("error_message" to exception.message))
@@ -138,8 +138,11 @@ class GlobalExceptionHandler {
 
     // Handle bad user input - JSON format issues
     @ExceptionHandler(HttpMessageNotReadableException::class)
-    fun handleJsonParseError(exception: HttpMessageNotReadableException, request: HttpRequest): ResponseEntity<*> {
-        MalformedInputExceptionLogEvent(exception, request.method, request.uri.path).error()
+    fun handleJsonParseError(
+        exception: HttpMessageNotReadableException,
+        request: HttpServletRequest
+    ): ResponseEntity<*> {
+        MalformedInputExceptionLogEvent(exception, request.method.let(HttpMethod::valueOf), request.contextPath).error()
         return ResponseEntity
             .status(BAD_REQUEST)
             .body(mapOf("error_message" to "Malformed request: ${exception.message}"))
