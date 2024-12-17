@@ -4,7 +4,9 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.slf4j.MDC
 import java.util.*
 
-data class EventId(val uuid: UUID)
+data class EventId(val uuid: UUID) {
+    override fun toString() = uuid.toString()
+}
 
 sealed class LogEvent {
     abstract val eventId: EventId

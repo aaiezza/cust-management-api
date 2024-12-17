@@ -13,7 +13,7 @@ class SoftDeleteCustomerStatement(
     fun execute(customerId: Customer.Id): Boolean {
         val rowsUpdated = dslContext.update(CUSTOMER)
             .set(CUSTOMER.DELETED_AT, DSL.currentOffsetDateTime())
-            .where(CUSTOMER.CUSTOMER_ID.eq(customerId.value).and(CUSTOMER.DELETED_AT.isNull))
+            .where(CUSTOMER.CUSTOMER_ID.eq(customerId.uuid).and(CUSTOMER.DELETED_AT.isNull))
             .execute()
 
         return rowsUpdated > 0

@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI
-import java.util.*
 
 @RestController
 @RequestMapping("/customer")
@@ -33,7 +32,7 @@ class CustomerController(
         runCatching { createCustomerStatement.execute(request) }
             .map { newCustomer ->
                 CustomerCreatedLogEvent(newCustomer).info()
-                val location = URI.create("/customer/${newCustomer.customerId.value}")
+                val location = URI.create("/customer/${newCustomer.customerId.uuid}")
                 ResponseEntity.created(location).body(newCustomer)
             }
             .recover {
@@ -49,24 +48,20 @@ class CustomerController(
             }.getOrThrow()
 
     @GetMapping("/{customerId}")
-    fun getCustomerById(@PathVariable("customerId") customerIdString: String): ResponseEntity<*> =
-        Customer.Id(UUID.fromString(customerIdString))
-            .let { customerId ->
-                getCustomerByIdStatement.execute(customerId)
-                    ?.let { customer -> ResponseEntity.ok(customer) } ?: run {
-                    val ex = CustomerNotFoundException(customerId)
-                    GetCustomerExceptionLogEvent(customerId, ex).error()
-                    ResponseEntity.status(NOT_FOUND)
-                        .body(mapOf("error" to ex.message))
-                }
-            }
+    fun getCustomerById(@PathVariable("customerId") customerId: Customer.Id): ResponseEntity<*> =
+        getCustomerByIdStatement.execute(customerId)
+            ?.let { customer -> ResponseEntity.ok(customer) } ?: run {
+            val ex = CustomerNotFoundException(customerId)
+            GetCustomerExceptionLogEvent(customerId, ex).error()
+            ResponseEntity.status(NOT_FOUND)
+                .body(mapOf("error" to ex.message))
+        }
 
     @PutMapping("/{customerId}")
     fun updateCustomer(
-        @PathVariable("customerId") customerIdString: String,
+        @PathVariable("customerId") customerId: Customer.Id,
         @RequestBody request: UpdateCustomerRequest
     ): ResponseEntity<*> {
-        val customerId = Customer.Id(UUID.fromString(customerIdString))
         return runCatching {
             getCustomerByIdStatement.execute(customerId)
                 ?.let {
@@ -99,8 +94,7 @@ class CustomerController(
     }
 
     @DeleteMapping("/{customerId}")
-    fun deleteCustomer(@PathVariable("customerId") customerIdString: String): ResponseEntity<Void> {
-        val customerId = Customer.Id(UUID.fromString(customerIdString))
+    fun deleteCustomer(@PathVariable("customerId") customerId: Customer.Id): ResponseEntity<Void> {
         return softDeleteCustomerStatement.execute(customerId)
             .let {
                 if (it) {

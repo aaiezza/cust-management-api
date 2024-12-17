@@ -81,7 +81,7 @@ class UpdateCustomerStatementIT(
         val exception = org.junit.jupiter.api.assertThrows<Exception> {
             subject.execute(nonExistentCustomerId, updateRequest)
         }
-        assertThat(exception.message).isEqualTo("A customer with id `${nonExistentCustomerId.value}` was not found")
+        assertThat(exception.message).isEqualTo("A customer with id `${nonExistentCustomerId.uuid}` was not found")
     }
 
     @Test
@@ -114,7 +114,7 @@ class UpdateCustomerStatementIT(
         val softDeletedCustomer = getCustomerByIdStatement.execute(originalCustomer.customerId)
         assertThat(softDeletedCustomer).isNull()
         dslContext.selectFrom(CUSTOMER)
-            .where(CUSTOMER.CUSTOMER_ID.eq(originalCustomer.customerId.value))
+            .where(CUSTOMER.CUSTOMER_ID.eq(originalCustomer.customerId.uuid))
             .fetchOne(CUSTOMER.DELETED_AT)
             .let { assertThat(it).isNotNull() }
 
@@ -129,7 +129,7 @@ class UpdateCustomerStatementIT(
         assertThat { subject.execute(originalCustomer.customerId, failedUpdateRequest) }
             .isFailure()
             .isInstanceOf(CustomerNotFoundException::class)
-            .hasMessage("A customer with id `${originalCustomer.customerId.value}` was not found")
+            .hasMessage("A customer with id `${originalCustomer.customerId.uuid}` was not found")
     }
 
     @Test

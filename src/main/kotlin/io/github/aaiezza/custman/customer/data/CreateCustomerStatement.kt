@@ -30,7 +30,7 @@ class CreateCustomerStatement(
                         CUSTOMER.PHONE_NUMBER
                     )
                     .values(
-                        it.id.value,
+                        it.id.uuid,
                         it.fullName.value,
                         it.preferredName.value,
                         it.emailAddress.value,

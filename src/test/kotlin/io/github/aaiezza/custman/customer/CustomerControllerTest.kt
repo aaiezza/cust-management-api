@@ -2,20 +2,15 @@ package io.github.aaiezza.custman.customer
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import ch.qos.logback.classic.LoggerContext
-import ch.qos.logback.classic.joran.JoranConfigurator
 import io.github.aaiezza.custman.customer.data.*
 import io.github.aaiezza.custman.customer.models.*
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.slf4j.LoggerFactory
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import java.net.URL
 import java.util.*
 
 @RestClientTest
@@ -86,7 +81,7 @@ class CustomerControllerTest {
         every { getCustomerByIdStatement.execute(customerId) } returns customer
 
         // Act
-        val response: ResponseEntity<*> = customerController.getCustomerById(customerId.value.toString())
+        val response: ResponseEntity<*> = customerController.getCustomerById(customerId)
 
         // Assert
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -104,7 +99,7 @@ class CustomerControllerTest {
         every { getCustomerByIdStatement.execute(customerId) } returns null
 
         // Act
-        val response: ResponseEntity<*> = customerController.getCustomerById(customerId.value.toString())
+        val response: ResponseEntity<*> = customerController.getCustomerById(customerId)
 
         // Assert
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
@@ -122,7 +117,7 @@ class CustomerControllerTest {
         every { softDeleteCustomerStatement.execute(customerId) } returns true
 
         // Act
-        val response: ResponseEntity<Void> = customerController.deleteCustomer(customerId.value.toString())
+        val response: ResponseEntity<Void> = customerController.deleteCustomer(customerId)
 
         // Assert
         assertThat(response.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
@@ -142,7 +137,7 @@ class CustomerControllerTest {
         every { updateCustomerStatement.execute(customerId, updateRequest) } returns updatedCustomer
 
         // Act
-        val response: ResponseEntity<*> = customerController.updateCustomer(customerId.value.toString(), updateRequest)
+        val response: ResponseEntity<*> = customerController.updateCustomer(customerId, updateRequest)
 
         // Assert
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -162,7 +157,7 @@ class CustomerControllerTest {
         every { getCustomerByIdStatement.execute(customerId) } returns null
 
         // Act
-        val response: ResponseEntity<*> = customerController.updateCustomer(customerId.value.toString(), updateRequest)
+        val response: ResponseEntity<*> = customerController.updateCustomer(customerId, updateRequest)
 
         // Assert
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)

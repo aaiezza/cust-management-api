@@ -12,7 +12,7 @@ class GetCustomerByIdStatement(
     fun execute(customerId: Customer.Id): Customer? =
         dslContext.select()
             .from(CUSTOMER)
-            .where(CUSTOMER.CUSTOMER_ID.eq(customerId.value).and(CUSTOMER.DELETED_AT.isNull))
+            .where(CUSTOMER.CUSTOMER_ID.eq(customerId.uuid).and(CUSTOMER.DELETED_AT.isNull))
             .fetchOne {
                 Customer(
                     customerId = Customer.Id(it.getValue(CUSTOMER.CUSTOMER_ID)),

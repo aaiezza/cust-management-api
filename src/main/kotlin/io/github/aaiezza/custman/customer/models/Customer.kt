@@ -1,11 +1,11 @@
 package io.github.aaiezza.custman.customer.models
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonIgnoreType
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
+import io.github.aaiezza.kutils.Dsi
 import java.time.OffsetDateTime
 import java.util.*
 import java.util.regex.Pattern
@@ -20,8 +20,9 @@ data class Customer(
     @JsonProperty("created_at") val createdAt: CreatedAt,
     @JsonProperty("updated_at") val updatedAt: UpdatedAt,
 ) {
-    data class Id(@JsonValue val value: UUID) {
-        override fun toString() = value.toString()
+    data class Id(override val uuid: UUID) : Dsi("custman", "customer", uuid) {
+        @JsonCreator
+        constructor(value: String) : this(toUUID(value))
     }
 
     data class FullName(@JsonValue val value: String) {

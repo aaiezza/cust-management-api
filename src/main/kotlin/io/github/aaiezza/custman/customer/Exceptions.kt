@@ -6,4 +6,4 @@ class CustomerAlreadyExistsWithGivenEmailException(emailAddress: Customer.EmailA
     Exception("A customer with email `${emailAddress.value}` already exists", cause)
 
 class CustomerNotFoundException(customerId: Customer.Id, cause: Throwable? = null) :
-    Exception("A customer with id `${customerId.value}` was not found", cause)
+    Exception("A customer with id `${customerId.uuid}` was not found", cause)

@@ -33,7 +33,7 @@ class UpdateCustomerStatement(
                 .set(CUSTOMER.EMAIL_ADDRESS, emailAddress.value)
                 .set(CUSTOMER.PHONE_NUMBER, phoneNumber.value)
                 .set(CUSTOMER.UPDATED_AT, DSL.currentOffsetDateTime())
-                .where(CUSTOMER.CUSTOMER_ID.eq(customerId.value).and(CUSTOMER.DELETED_AT.isNull()))
+                .where(CUSTOMER.CUSTOMER_ID.eq(customerId.uuid).and(CUSTOMER.DELETED_AT.isNull()))
 
         }.let { statement ->
             logger.trace { statement.sql }
@@ -45,6 +45,6 @@ class UpdateCustomerStatement(
         }
 
         return getCustomerByIdStatement.execute(customerId)
-            ?: error { "Failed to get customer after update `${customerId.value}`" }
+            ?: error { "Failed to get customer after update `${customerId.uuid}`" }
     }
 }

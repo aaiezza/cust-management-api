@@ -42,4 +42,5 @@ class UnhandledExceptionLogEvent(
     private val throwable: Throwable,
 ) : BaseLogEvent({
     it["error_message"] = throwable.message.toString()
+    it["stack_trace"] = throwable.stackTraceToString()
 })

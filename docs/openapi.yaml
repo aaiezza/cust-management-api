@@ -32,63 +32,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/customer'
               example:
-                id: "3"
+                id: "custman:customer:123e4567-e89b-12d3-a456-426614174000"
                 full_name: "Jane Smith"
                 preferred_name: "Janie"
                 email_address: "jane.smith@example.com"
                 phone_number: "+19876543210"
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "Invalid request payload."
-        '409':
-          description: Email conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "A customer with the same `email_address` is not allowed."
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "An unexpected error occurred."
-    get:
-      summary: Get all customers
-      operationId: getCustomers
-      tags:
-        - Customers
-      responses:
-        '200':
-          description: A list of customers
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/customer'
-              example:
-                - id: "1"
-                  full_name: "John Doe"
-                  preferred_name: "Johnny"
-                  email_address: "john.doe@example.com"
-                  phone_number: "+1234567890"
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "An unexpected error occurred."
   /customer/{id}:
     put:
       summary: Update a customer by ID
@@ -100,8 +48,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
-          description: The ID of the customer to update
+            $ref: '#/components/schemas/customer_id'
+          description: "The namespaced ID of the customer to update (format: custman:customer:{uuid})"
       requestBody:
         required: true
         content:
@@ -121,35 +69,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/customer'
               example:
-                id: "1"
+                id: "custman:customer:123e4567-e89b-12d3-a456-426614174000"
                 full_name: "John Doe"
                 preferred_name: "Johnny"
                 email_address: "john.doe@update.com"
                 phone_number: "+1234567890"
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "Invalid request payload."
-        '404':
-          description: Customer not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "Customer not found."
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "An unexpected error occurred."
     get:
       summary: Get a customer by ID
       operationId: getCustomerById
@@ -160,8 +84,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
-          description: The ID of the customer to retrieve
+            $ref: '#/components/schemas/customer_id'
+          description: "The namespaced ID of the customer to retrieve (format: custman:customer:{uuid})"
       responses:
         '200':
           description: Customer found
@@ -170,66 +94,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/customer'
               example:
-                id: "1"
+                id: "custman:customer:123e4567-e89b-12d3-a456-426614174000"
                 full_name: "John Doe"
                 preferred_name: "Johnny"
                 email_address: "john.doe@example.com"
                 phone_number: "+1234567890"
-        '404':
-          description: Customer not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "Customer not found."
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "An unexpected error occurred."
-    delete:
-      summary: Delete a customer by ID
-      operationId: deleteCustomer
-      tags:
-        - Customers
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-          description: The ID of the customer to delete
-      responses:
-        '204':
-          description: Customer deleted
-        '404':
-          description: Customer not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "Customer not found."
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response'
-              example:
-                error_message: "An unexpected error occurred."
 components:
   schemas:
+    customer_id:
+      type: string
+      description: "Unique namespaced identifier for the customer (format: custman:customer:{uuid})"
+      pattern: '^custman:customer:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$'
+      example: "custman:customer:123e4567-e89b-12d3-a456-426614174000"
     customer:
       type: object
       properties:
         id:
-          type: string
-          description: Unique identifier for the customer
+          $ref: '#/components/schemas/customer_id'
         full_name:
           type: string
           description: The full name of the customer
@@ -244,14 +125,6 @@ components:
           type: string
           description: The phone number of the customer
           pattern: '^\+?[1-9]\d{1,14}$'
-        created_at:
-          type: string
-          format: date-time
-          description: Timestamp when the customer was created
-        updated_at:
-          type: string
-          format: date-time
-          description: Timestamp when the customer was last updated
     customer_input:
       type: object
       properties:
@@ -269,9 +142,3 @@ components:
           type: string
           description: The phone number of the customer
           pattern: '^\+?[1-9]\d{1,14}$'
-    error_response:
-      type: object
-      properties:
-        error_message:
-          type: string
-          description: Detailed error message
