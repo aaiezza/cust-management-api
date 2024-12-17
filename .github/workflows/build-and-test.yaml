@@ -56,10 +56,36 @@ jobs:
       - name: Create Docker Network
         run: docker network create test-network
 
+      # Start the Database Container
+      - name: Start Database Container
+        run: |
+          docker run -d --name database --network test-network \
+            -e POSTGRES_USER=customer_user \
+            -e POSTGRES_PASSWORD=customer_pass \
+            -e POSTGRES_DB=customer_db \
+            -p 5432:5432 postgres:15-alpine
+          echo "Waiting for database to be ready..."
+          until docker exec database pg_isready -U customer_user -d customer_db; do
+            sleep 3
+          done
+          echo "Database is ready!"
+
+      # Run Flyway Migrations
+      - name: Run Flyway Migrations
+        run: |
+          docker run --rm --network test-network \
+            -v $(pwd):/flyway \
+            flyway/flyway:9.22.3 \
+            -url=jdbc:postgresql://database:5432/customer_db \
+            -user=customer_user -password=customer_pass migrate
+
       # Start the App Container with Health Check
       - name: Start App Container
         run: |
           docker run -d --name app --network test-network \
+            -e SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/customer_db \
+            -e SPRING_DATASOURCE_USERNAME=customer_user \
+            -e SPRING_DATASOURCE_PASSWORD=customer_pass \
             --health-cmd "curl --fail http://localhost:8080/actuator/health || exit 1" \
             --health-interval 5s --health-retries 5 --health-timeout 3s \
             -p 8080:8080 customer-management-api
@@ -101,5 +127,5 @@ jobs:
       # Clean up Docker Network and Containers
       - name: Clean Up
         run: |
-          docker stop app
+          docker stop app database
           docker network rm test-network
