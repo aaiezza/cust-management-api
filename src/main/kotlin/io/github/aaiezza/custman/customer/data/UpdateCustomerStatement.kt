@@ -19,32 +19,44 @@ class UpdateCustomerStatement(
     private val logger = KotlinLogging.logger(UpdateCustomerStatement::class.qualifiedName.toString())
 
     fun execute(customerId: Customer.Id, request: UpdateCustomerRequest): Customer {
-        getCustomerByEmailAddressStatement.execute(request.emailAddress)
-            ?.also {
-                if (it.customerId != customerId)
-                    throw CustomerAlreadyExistsWithGivenEmailException(request.emailAddress)
+        return dslContext.transactionResult { configuration ->
+            val customerToUpdate = request.emailAddress?.let { emailAddress ->
+                getCustomerByEmailAddressStatement.execute(emailAddress)
+                    ?.also {
+                        if (it.customerId != customerId)
+                            throw CustomerAlreadyExistsWithGivenEmailException(emailAddress)
+                    }
+            } ?: getCustomerByIdStatement.execute(customerId) ?: throw CustomerNotFoundException(customerId)
+
+            with(customerToUpdate) {
+                copy(
+                    fullName = request.fullName ?: fullName,
+                    preferredName = request.preferredName ?: preferredName,
+                    emailAddress = request.emailAddress ?: emailAddress,
+                    phoneNumber = request.phoneNumber ?: phoneNumber,
+                )
+            }.let { customerWithUpdates ->
+                with(customerWithUpdates) {
+                    configuration.dsl()
+                        .update(CUSTOMER)
+                        .set(CUSTOMER.FULL_NAME, fullName.value)
+                        .set(CUSTOMER.PREFERRED_NAME, preferredName.value)
+                        .set(CUSTOMER.EMAIL_ADDRESS, emailAddress.value)
+                        .set(CUSTOMER.PHONE_NUMBER, phoneNumber.value)
+                        .set(CUSTOMER.UPDATED_AT, DSL.currentOffsetDateTime())
+                        .where(CUSTOMER.CUSTOMER_ID.eq(customerId.uuid).and(CUSTOMER.DELETED_AT.isNull()))
+                }
+            }.let { statement ->
+                logger.trace { statement.sql }
+                statement.execute()
+            }.let { modifiedRowCount ->
+                if (modifiedRowCount <= 0) {
+                    throw CustomerNotFoundException(customerId, IllegalStateException("Failed to update customer"))
+                }
             }
 
-        with(request) {
-            dslContext
-                .update(CUSTOMER)
-                .set(CUSTOMER.FULL_NAME, fullName.value)
-                .set(CUSTOMER.PREFERRED_NAME, preferredName.value)
-                .set(CUSTOMER.EMAIL_ADDRESS, emailAddress.value)
-                .set(CUSTOMER.PHONE_NUMBER, phoneNumber.value)
-                .set(CUSTOMER.UPDATED_AT, DSL.currentOffsetDateTime())
-                .where(CUSTOMER.CUSTOMER_ID.eq(customerId.uuid).and(CUSTOMER.DELETED_AT.isNull()))
-
-        }.let { statement ->
-            logger.trace { statement.sql }
-            statement.execute()
-        }.let { modifiedRowCount ->
-            if (modifiedRowCount <= 0) {
-                throw CustomerNotFoundException(customerId, IllegalStateException("Failed to update customer"))
-            }
+            getCustomerByIdStatement.execute(customerId)
+                ?: error { "Failed to get customer after update `${customerId.uuid}`" }
         }
-
-        return getCustomerByIdStatement.execute(customerId)
-            ?: error { "Failed to get customer after update `${customerId.uuid}`" }
     }
 }

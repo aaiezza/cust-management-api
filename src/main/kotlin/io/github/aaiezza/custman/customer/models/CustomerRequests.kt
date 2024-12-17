@@ -31,10 +31,10 @@ fun CreateCustomerRequest.toCustomerStub(): Stub = Stub(
 
 
 data class UpdateCustomerRequest(
-    @JsonProperty("full_name") val fullName: FullName,
-    @JsonProperty("preferred_name") val preferredName: PreferredName,
-    @JsonProperty("email_address") val emailAddress: EmailAddress,
-    @JsonProperty("phone_number") val phoneNumber: PhoneNumber,
+    @JsonProperty("full_name") val fullName: FullName?,
+    @JsonProperty("preferred_name") val preferredName: PreferredName?,
+    @JsonProperty("email_address") val emailAddress: EmailAddress?,
+    @JsonProperty("phone_number") val phoneNumber: PhoneNumber?,
 ) {
     companion object
 }
