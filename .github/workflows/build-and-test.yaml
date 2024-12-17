@@ -1,14 +1,48 @@
-name: Postman API Tests
+name: Maven Build, Docker Image, and Postman Tests
 
 on:
-  workflow_run:
-    workflows: ["Maven Build and Docker Image"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
 
 jobs:
-  run-tests:
+  build:
     runs-on: ubuntu-24.04
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Set up JDK 21 Corretto
+      - name: Set up JDK 21 (Corretto)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      # Set up Maven caching for faster builds
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
+      # Run Maven Build
+      - name: Run Maven Build
+        run: mvn clean package
+
+      # Upload the target directory as an artifact
+      - name: Upload Maven Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-build
+          path: target/
+
+  test:
+    runs-on: ubuntu-24.04
+    needs: build
 
     steps:
       # Checkout the repository
