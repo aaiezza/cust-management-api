@@ -23,46 +23,50 @@ class UpdateCustomerStatement(
         execute(dslContext.configuration(), customerId, request)
 
     fun execute(configuration: Configuration, customerId: Customer.Id, request: UpdateCustomerRequest): Customer {
-        return configuration.dsl().transactionResult { transaction ->
-            val customerToUpdate = request.emailAddress?.let { emailAddress ->
-                getCustomerByEmailAddressStatement.execute(transaction, emailAddress)
-                    ?.also {
-                        if (it.customerId != customerId)
-                            throw CustomerAlreadyExistsWithGivenEmailException(emailAddress)
-                    }
-            } ?: getCustomerByIdStatement.execute(transaction, customerId) ?: throw CustomerNotFoundException(
-                customerId
-            )
-
-            with(customerToUpdate) {
-                copy(
-                    fullName = request.fullName ?: fullName,
-                    preferredName = request.preferredName ?: preferredName,
-                    emailAddress = request.emailAddress ?: emailAddress,
-                    phoneNumber = request.phoneNumber ?: phoneNumber,
+        try {
+            return configuration.dsl().transactionResult { transaction ->
+                val customerToUpdate = request.emailAddress?.let { emailAddress ->
+                    getCustomerByEmailAddressStatement.execute(transaction, emailAddress)
+                        ?.also {
+                            if (it.customerId != customerId)
+                                throw CustomerAlreadyExistsWithGivenEmailException(emailAddress)
+                        }
+                } ?: getCustomerByIdStatement.execute(transaction, customerId) ?: throw CustomerNotFoundException(
+                    customerId
                 )
-            }.let { customerWithUpdates ->
-                with(customerWithUpdates) {
-                    transaction.dsl()
-                        .update(CUSTOMER)
-                        .set(CUSTOMER.FULL_NAME, fullName.value)
-                        .set(CUSTOMER.PREFERRED_NAME, preferredName.value)
-                        .set(CUSTOMER.EMAIL_ADDRESS, emailAddress.value)
-                        .set(CUSTOMER.PHONE_NUMBER, phoneNumber.value)
-                        .set(CUSTOMER.UPDATED_AT, DSL.currentOffsetDateTime())
-                        .where(CUSTOMER.CUSTOMER_ID.eq(customerId.uuid).and(CUSTOMER.DELETED_AT.isNull()))
-                }
-            }.let { statement ->
-                logger.trace { statement.sql }
-                statement.execute()
-            }.let { modifiedRowCount ->
-                if (modifiedRowCount <= 0) {
-                    throw CustomerNotFoundException(customerId, IllegalStateException("Failed to update customer"))
-                }
-            }
 
-            getCustomerByIdStatement.execute(transaction, customerId)
-                ?: error { "Failed to get customer after update `${customerId.uuid}`" }
+                with(customerToUpdate) {
+                    copy(
+                        fullName = request.fullName ?: fullName,
+                        preferredName = request.preferredName ?: preferredName,
+                        emailAddress = request.emailAddress ?: emailAddress,
+                        phoneNumber = request.phoneNumber ?: phoneNumber,
+                    )
+                }.let { customerWithUpdates ->
+                    with(customerWithUpdates) {
+                        transaction.dsl()
+                            .update(CUSTOMER)
+                            .set(CUSTOMER.FULL_NAME, fullName.value)
+                            .set(CUSTOMER.PREFERRED_NAME, preferredName.value)
+                            .set(CUSTOMER.EMAIL_ADDRESS, emailAddress.value)
+                            .set(CUSTOMER.PHONE_NUMBER, phoneNumber.value)
+                            .set(CUSTOMER.UPDATED_AT, DSL.currentOffsetDateTime())
+                            .where(CUSTOMER.CUSTOMER_ID.eq(customerId.uuid).and(CUSTOMER.DELETED_AT.isNull()))
+                    }
+                }.let { statement ->
+                    logger.trace { statement.sql }
+                    statement.execute()
+                }.let { modifiedRowCount ->
+                    if (modifiedRowCount <= 0) {
+                        throw CustomerNotFoundException(customerId, IllegalStateException("Failed to update customer"))
+                    }
+                }
+
+                getCustomerByIdStatement.execute(transaction, customerId)
+                    ?: error { "Failed to get customer after update `${customerId.uuid}`" }
+            }
+        } catch (exception: Exception) {
+            throw exception.cause ?: exception
         }
     }
 }

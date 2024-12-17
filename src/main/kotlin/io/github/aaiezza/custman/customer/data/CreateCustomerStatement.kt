@@ -18,7 +18,7 @@ class CreateCustomerStatement(
 
     // TODO: Add logging
     fun execute(configuration: Configuration, request: CreateCustomerRequest): Customer {
-        if (emailExistsStatement.execute(request.emailAddress)) {
+        if (emailExistsStatement.execute(configuration, request.emailAddress)) {
             throw CustomerAlreadyExistsWithGivenEmailException(request.emailAddress)
         }
         val customer = request.toCustomerStub()

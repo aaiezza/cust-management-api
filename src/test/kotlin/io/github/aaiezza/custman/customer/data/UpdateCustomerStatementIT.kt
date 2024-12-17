@@ -2,13 +2,13 @@ package io.github.aaiezza.custman.customer.data
 
 import assertk.assertThat
 import assertk.assertions.*
+import io.github.aaiezza.custman.customer.CustomerAlreadyExistsWithGivenEmailException
 import io.github.aaiezza.custman.customer.CustomerNotFoundException
 import io.github.aaiezza.custman.customer.models.CreateCustomerRequest
 import io.github.aaiezza.custman.customer.models.Customer
 import io.github.aaiezza.custman.customer.models.UpdateCustomerRequest
 import io.github.aaiezza.custman.customer.models.sample
 import io.github.aaiezza.custman.jooq.generated.Tables.CUSTOMER
-import org.jooq.exception.DataAccessException
 import org.jooq.impl.DefaultDSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,6 +28,9 @@ class UpdateCustomerStatementIT(
     @Autowired private val softDeleteCustomerStatement: SoftDeleteCustomerStatement,
     @Autowired private val subject: UpdateCustomerStatement,
 ) {
+
+    @Autowired
+    private lateinit var updateCustomerStatement: UpdateCustomerStatement
 
     @Autowired
     private lateinit var dslContext: DefaultDSLContext
@@ -82,8 +85,6 @@ class UpdateCustomerStatementIT(
         // Act & Assert
         assertThat { subject.execute(nonExistentCustomerId, updateRequest) }
             .isFailure()
-            .isInstanceOf(DataAccessException::class)
-            .cause().isNotNull()
             .isInstanceOf(CustomerNotFoundException::class)
             .hasMessage("A customer with id `${nonExistentCustomerId.uuid}` was not found")
     }
@@ -132,8 +133,6 @@ class UpdateCustomerStatementIT(
 
         assertThat { subject.execute(originalCustomer.customerId, failedUpdateRequest) }
             .isFailure()
-            .isInstanceOf(DataAccessException::class)
-            .cause().isNotNull()
             .isInstanceOf(CustomerNotFoundException::class)
             .hasMessage("A customer with id `${originalCustomer.customerId.uuid}` was not found")
     }
@@ -141,38 +140,44 @@ class UpdateCustomerStatementIT(
     @Test
     fun `should enforce unique email address for active customers`() {
         // Arrange: Create a customer
-        val existingCustomer = createCustomerStatement.execute(
+        val existingCustomerA = createCustomerStatement.execute(
             CreateCustomerRequest.sample.copy(
                 emailAddress = Customer.EmailAddress("unique@example.com"),
                 fullName = Customer.FullName("Existing Name")
             )
         )
 
-        // Act & Assert: Attempt to create another customer with the same email address
-        val exception = org.junit.jupiter.api.assertThrows<Exception> {
-            createCustomerStatement.execute(
-                CreateCustomerRequest.sample.copy(
-                    emailAddress = Customer.EmailAddress("unique@example.com"),
-                    fullName = Customer.FullName("New Name")
-                )
-            )
-        }
-        assertThat(exception).messageContains("A customer with email `unique@example.com` already exists")
-
-        // Arrange: Soft delete the existing customer
-        softDeleteCustomerStatement.execute(existingCustomer.customerId)
-
-        // Act: Create a new customer with the same email address after soft delete
-        val newCustomer = createCustomerStatement.execute(
+        val existingCustomerB = createCustomerStatement.execute(
             CreateCustomerRequest.sample.copy(
-                emailAddress = Customer.EmailAddress("unique@example.com"),
-                fullName = Customer.FullName("Recovered Name")
+                emailAddress = Customer.EmailAddress("another@example.com"),
+                fullName = Customer.FullName("Another Existing Name")
             )
         )
 
+        // Act & Assert: Attempt to update customer's email that is owned by another customer
+        assertThat {
+            updateCustomerStatement.execute(
+                existingCustomerB.customerId,
+                UpdateCustomerRequest(emailAddress = existingCustomerA.emailAddress)
+            )
+        }
+            .isFailure()
+            .isInstanceOf(CustomerAlreadyExistsWithGivenEmailException::class)
+            .messageContains("A customer with email `unique@example.com` already exists")
+
+        // Arrange: Soft delete the existing customer
+        softDeleteCustomerStatement.execute(existingCustomerA.customerId)
+
+        // Act: Create a new customer with the same email address after soft delete
+        val updatedCustomerB = updateCustomerStatement.execute(
+            existingCustomerB.customerId,
+            UpdateCustomerRequest(emailAddress = existingCustomerA.emailAddress)
+        )
+
+
         // Assert: Ensure the new customer was created successfully
-        assertThat(newCustomer).isNotNull()
-        assertThat(newCustomer.emailAddress).isEqualTo(Customer.EmailAddress("unique@example.com"))
+        assertThat(updatedCustomerB).isNotNull()
+        assertThat(updatedCustomerB.emailAddress).isEqualTo(Customer.EmailAddress("unique@example.com"))
     }
 
 }

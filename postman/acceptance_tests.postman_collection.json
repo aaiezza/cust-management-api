@@ -1,221 +1,526 @@
 {
-	"info": {
-		"name": "acceptance_tests",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"item": [
-		{
-			"name": "Customer",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Should return 201 created response', () => {",
-							"    pm.response.to.have.status(201);",
-							"});",
-							"",
-							"const json = pm.response.json();",
-							"pm.collectionVariables.set('customer_id', json.customer_id);",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"full_name\": \"John Doe III\",\n    \"preferred_name\": \"Johnny\",\n    \"email_address\": \"johnny+{{$randomBankAccount}}@example.com\",\n    \"phone_number\": \"+12223334444\"\n}   \n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/customer",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"customer"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Customer by Id",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Should return 200 ok response', () => {",
-							"    pm.response.to.be.ok;",
-							"});",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/customer/{{customer_id}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"customer",
-						"{{customer_id}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Customers",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Should return 200 ok response', () => {",
-							"    pm.response.to.be.ok;",
-							"});",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/customer",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"customer"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Customer",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Should return 200 ok response', () => {",
-							"    pm.response.to.be.ok;",
-							"});",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"full_name\": \"Jonathon Doe Jr.\",\n    \"preferred_name\": \"John\",\n    \"email_address\": \"johnny.doe@example.com\",\n    \"phone_number\": \"+12223335474\"\n}   \n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/customer/{{customer_id}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"customer",
-						"{{customer_id}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Customer",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Should return 204 no content response', () => {",
-							"    pm.response.to.have.status(204);",
-							"});",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/customer/{{customer_id}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"customer",
-						"{{customer_id}}"
-					]
-				}
-			},
-			"response": []
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "host",
-			"value": "http://app:8080",
-			"type": "string"
-		}
-	]
+  "info": {
+    "name": "customer_management_tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Customer",
+      "item": [
+        {
+          "name": "Create Customer - Success (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Should return 201 Created', () => {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('Response should include valid customer data', () => {",
+                  "    pm.expect(json).to.have.property('customer_id');",
+                  "    pm.expect(json).to.have.property('full_name').that.is.a('string');",
+                  "    pm.expect(json).to.have.property('email_address').that.is.a('string');",
+                  "    pm.expect(json).to.have.property('phone_number').that.is.a('string');",
+                  "});",
+                  "pm.collectionVariables.set('customer_id', json.customer_id);",
+                  "pm.collectionVariables.set('email_address', json.email_address);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Jane Doe\",\n  \"preferred_name\": \"Janie\",\n  \"email_address\": \"jane.doe+{{$randomBankAccount}}@example.com\",\n  \"phone_number\": \"+12223334444\"\n}"
+            },
+            "url": {
+              "raw": "{{host}}/customer",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "customer"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Customer - Invalid Input (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Should return 400 Bad Request', () => {",
+                  "    pm.response.to.have.status(400);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('error_message').that.is.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"\",\n  \"email_address\": \"invalid-email\"\n}"
+            },
+            "url": {
+              "raw": "{{host}}/customer",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "customer"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Customer - Conflict (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Should return 409 Conflict', () => {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('Should have error message in response body', () => {",
+                  "    pm.expect(json).to.have.property('error_message').that.is.a('string');",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Existing User\",\n  \"preferred_name\": \"Imposter\",\n  \"email_address\": \"{{email_address}}\",\n  \"phone_number\": \"+12223334444\"\n}"
+            },
+            "url": {
+              "raw": "{{host}}/customer",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "customer"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Retrieve Customers",
+      "item": [
+        {
+          "name": "Get All Customers - Success (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Should return 200 OK', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('Should return array of customers in the response body', () => {",
+                  "    pm.expect(json.customers).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/customer",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "customer"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Customer By ID - Success (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Should return 200 OK', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('customer_id', pm.collectionVariables.get('customer_id'));",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/customer/{{customer_id}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "customer",
+                "{{customer_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Customer By ID - Not Found (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Should return 404 Not Found', () => {",
+                  "    pm.response.to.be.notFound;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('error_message').that.is.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/customer/custman:customer:0ab7775a-c41d-4b47-905d-beaaa0bb3716",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "customer",
+                "custman:customer:0ab7775a-c41d-4b47-905d-beaaa0bb3716"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Update Customer",
+      "item": [
+        {
+          "name": "Conflicting Email Test",
+          "item": [
+            {
+              "name": "Create Customer A",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Should return 201 Created', () => {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "const json = pm.response.json();",
+                      "pm.test('Response should include valid customer data', () => {",
+                      "    pm.expect(json).to.have.property('customer_id');",
+                      "    pm.expect(json).to.have.property('full_name').that.is.a('string');",
+                      "    pm.expect(json).to.have.property('email_address').that.is.a('string');",
+                      "    pm.expect(json).to.have.property('phone_number').that.is.a('string');",
+                      "});",
+                      "pm.collectionVariables.set('customer_id_a', json.customer_id);",
+                      "pm.collectionVariables.set('email_address_a', json.email_address);"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"full_name\": \"Alice Awesome\",\n  \"preferred_name\": \"Maestro\",\n  \"email_address\": \"alice.awesome+{{$randomBankAccount}}@example.com\",\n  \"phone_number\": \"+12223334444\"\n}"
+                },
+                "url": {
+                  "raw": "{{host}}/customer",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "path": [
+                    "customer"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Customer B",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Should return 201 Created', () => {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "const json = pm.response.json();",
+                      "pm.test('Response should include valid customer data', () => {",
+                      "    pm.expect(json).to.have.property('customer_id');",
+                      "    pm.expect(json).to.have.property('full_name').that.is.a('string');",
+                      "    pm.expect(json).to.have.property('email_address').that.is.a('string');",
+                      "    pm.expect(json).to.have.property('phone_number').that.is.a('string');",
+                      "});",
+                      "pm.collectionVariables.set('customer_id', json.customer_id);",
+                      "pm.collectionVariables.set('email_address', json.email_address);"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"full_name\": \"Bob Fantastic\",\n  \"preferred_name\": \"Chef\",\n  \"email_address\": \"bob.fantastic+{{$randomBankAccount}}@example.com\",\n  \"phone_number\": \"+12223335555\"\n}"
+                },
+                "url": {
+                  "raw": "{{host}}/customer",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "path": [
+                    "customer"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Customer A with B Email- Conflict (409)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Should return 409 Conflict', () => {",
+                      "    pm.response.to.have.status(409);",
+                      "});",
+                      "const json = pm.response.json();",
+                      "pm.test('Should have error message in response body', () => {",
+                      "    pm.expect(json).to.have.property('error_message').that.is.a('string');",
+                      "});",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email_address\": \"{{email_address_a}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{host}}/customer/{{customer_id}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "path": [
+                    "customer",
+                    "{{customer_id}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Update Customer - Success (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Should return 200 OK', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('full_name', 'John Doe Updated');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"John Doe Updated\",\n  \"preferred_name\": \"Johnny\",\n  \"email_address\": \"updated+{{$randomBankAccount}}@example.com\",\n  \"phone_number\": \"+12223335555\"\n}"
+            },
+            "url": {
+              "raw": "{{host}}/customer/{{customer_id}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "customer",
+                "{{customer_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Delete Customer",
+      "item": [
+        {
+          "name": "Delete Customer - Success (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Should return 204 No Content', () => {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/customer/{{customer_id}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "customer",
+                "{{customer_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Customer - Not Found (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Should return 204 No Content', () => {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/customer/{{customer_id}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "customer",
+                "{{customer_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "host",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
 }
