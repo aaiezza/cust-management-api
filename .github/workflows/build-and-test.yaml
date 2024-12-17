@@ -32,7 +32,7 @@ jobs:
           name: maven-build
           path: target/
 
-  test:
+  acceptance-tests:
     runs-on: ubuntu-24.04
     needs: build
 
@@ -74,10 +74,13 @@ jobs:
       - name: Run Flyway Migrations
         run: |
           docker run --rm --network test-network \
-            -v $(pwd):/flyway \
-            flyway/flyway:9.22.3 \
-            -url=jdbc:postgresql://database:5432/customer_db \
-            -user=customer_user -password=customer_pass migrate
+            --name maven_flyway_migration \
+            -v $(pwd):/usr/src/app \
+            -v ~/.m2:/root/.m2 \
+            -w /usr/src/app \
+            maven:3.9.9-amazoncorretto-21-alpine \
+            mvn flyway:migrate -P flyway
+
 
       # Start the App Container with Health Check
       - name: Start App Container
