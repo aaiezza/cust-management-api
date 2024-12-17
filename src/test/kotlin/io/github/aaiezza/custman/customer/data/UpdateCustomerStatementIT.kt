@@ -8,6 +8,7 @@ import io.github.aaiezza.custman.customer.models.Customer
 import io.github.aaiezza.custman.customer.models.UpdateCustomerRequest
 import io.github.aaiezza.custman.customer.models.sample
 import io.github.aaiezza.custman.jooq.generated.Tables.CUSTOMER
+import org.jooq.exception.DataAccessException
 import org.jooq.impl.DefaultDSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -59,11 +60,12 @@ class UpdateCustomerStatementIT(
         // Assert
         val updatedCustomer = getCustomerByIdStatement.execute(originalCustomer.customerId)
         assertThat(updatedCustomer).isNotNull()
-        assertThat(updatedCustomer?.fullName).isEqualTo(updateRequest.fullName)
-        assertThat(updatedCustomer?.preferredName).isEqualTo(updateRequest.preferredName)
-        assertThat(updatedCustomer?.emailAddress).isEqualTo(updateRequest.emailAddress)
-        assertThat(updatedCustomer?.phoneNumber).isEqualTo(updateRequest.phoneNumber)
-        assertThat(updatedCustomer?.updatedAt).isNotNull().transform { it.value }.isGreaterThan(originalCustomer.updatedAt.value)
+        assertThat(updatedCustomer?.fullName).isNotNull().isEqualTo(updateRequest.fullName)
+        assertThat(updatedCustomer?.preferredName).isNotNull().isEqualTo(updateRequest.preferredName)
+        assertThat(updatedCustomer?.emailAddress).isNotNull().isEqualTo(updateRequest.emailAddress)
+        assertThat(updatedCustomer?.phoneNumber).isNotNull().isEqualTo(updateRequest.phoneNumber)
+        assertThat(updatedCustomer?.updatedAt).isNotNull().transform { it.value }
+            .isGreaterThan(originalCustomer.updatedAt.value)
     }
 
     @Test
@@ -78,10 +80,12 @@ class UpdateCustomerStatementIT(
         )
 
         // Act & Assert
-        val exception = org.junit.jupiter.api.assertThrows<Exception> {
-            subject.execute(nonExistentCustomerId, updateRequest)
-        }
-        assertThat(exception.message).isEqualTo("A customer with id `${nonExistentCustomerId.uuid}` was not found")
+        assertThat { subject.execute(nonExistentCustomerId, updateRequest) }
+            .isFailure()
+            .isInstanceOf(DataAccessException::class)
+            .cause().isNotNull()
+            .isInstanceOf(CustomerNotFoundException::class)
+            .hasMessage("A customer with id `${nonExistentCustomerId.uuid}` was not found")
     }
 
     @Test
@@ -128,6 +132,8 @@ class UpdateCustomerStatementIT(
 
         assertThat { subject.execute(originalCustomer.customerId, failedUpdateRequest) }
             .isFailure()
+            .isInstanceOf(DataAccessException::class)
+            .cause().isNotNull()
             .isInstanceOf(CustomerNotFoundException::class)
             .hasMessage("A customer with id `${originalCustomer.customerId.uuid}` was not found")
     }

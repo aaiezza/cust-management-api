@@ -19,10 +19,10 @@ class UpdateCustomerRequestSerializationTest {
 
         val expectedJson = """
             {
-                "full_name": "${updateRequest.fullName.value}",
-                "preferred_name": "${updateRequest.preferredName.value}",
-                "email_address": "${updateRequest.emailAddress.value}",
-                "phone_number": "${updateRequest.phoneNumber.value}"
+                "full_name": "${updateRequest.fullName?.value}",
+                "preferred_name": "${updateRequest.preferredName?.value}",
+                "email_address": "${updateRequest.emailAddress?.value}",
+                "phone_number": "${updateRequest.phoneNumber?.value}"
             }
         """.trimIndent()
 
@@ -42,10 +42,10 @@ class UpdateCustomerRequestSerializationTest {
 
         val json = """
             {
-                "full_name": "${updateRequest.fullName.value}",
-                "preferred_name": "${updateRequest.preferredName.value}",
-                "email_address": "${updateRequest.emailAddress.value}",
-                "phone_number": "${updateRequest.phoneNumber.value}"
+                "full_name": "${updateRequest.fullName?.value}",
+                "preferred_name": "${updateRequest.preferredName?.value}",
+                "email_address": "${updateRequest.emailAddress?.value}",
+                "phone_number": "${updateRequest.phoneNumber?.value}"
             }
         """.trimIndent()
 

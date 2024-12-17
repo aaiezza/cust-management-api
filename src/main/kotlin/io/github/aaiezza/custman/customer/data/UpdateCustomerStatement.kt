@@ -30,7 +30,9 @@ class UpdateCustomerStatement(
                         if (it.customerId != customerId)
                             throw CustomerAlreadyExistsWithGivenEmailException(emailAddress)
                     }
-            } ?: getCustomerByIdStatement.execute(transaction, customerId) ?: throw CustomerNotFoundException(customerId)
+            } ?: getCustomerByIdStatement.execute(transaction, customerId) ?: throw CustomerNotFoundException(
+                customerId
+            )
 
             with(customerToUpdate) {
                 copy(
