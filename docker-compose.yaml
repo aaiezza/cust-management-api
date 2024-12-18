@@ -1,0 +1,32 @@
+services:
+  database:
+    image: postgres:15-alpine
+    container_name: customer_db
+    environment:
+      POSTGRES_USER: customer_user
+      POSTGRES_PASSWORD: customer_pass
+      POSTGRES_DB: customer_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U customer_user -d customer_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  flyway-migration:
+    image: maven:3.9.9-amazoncorretto-21-alpine
+    container_name: maven_flyway_migration
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/app
+      - ~/.m2:/root/.m2
+    working_dir: /usr/src/app
+    command: [ "mvn", "flyway:migrate", "-P", "flyway" ]
+
+volumes:
+  postgres_data:
